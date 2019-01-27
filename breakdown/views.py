@@ -9,6 +9,7 @@ def index(request):
 
 class TicketList(ListView):
     model = Ticket
+    paginate_by = 5
 
 class TicketDetail(DetailView):
     model = Ticket
