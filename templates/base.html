@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.bootcss.com/twitter-bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
+    <title>
+        {% block title %}Whatever{% endblock %}
+    </title>
+    <style>
+        .whatever-masthead {
+            background-color: #EEEEEE;
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="whatever-masthead">
+        <div class="container">
+            <nav class="nav">
+                <div class="navbar-brand">Whatever</div>
+                <a class="nav-link" href="{% url 'breakdown:TicketList' %}">
+                    Tickets
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 whatever-main">
+                {% block main%}{% endblock%}
+            </div>
+            <div class="col-sm-3 offset-sm-1 whatever-sidebar">
+                {% block sidebar %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
