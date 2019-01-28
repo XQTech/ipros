@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from enum import Enum
 
@@ -28,17 +28,25 @@ class Customer(models.Model):
         return self.name
 
 
+class TicketManager(models.Manager):
+    def all_with_prefetch_breakdown(self):
+        qs = self.get_queryset()
+        return qs.prefetch_related('breakdown')
+
+
 class Ticket(models.Model):
     status = models.ForeignKey(Status, on_delete=models.PROTECT)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     assigned_user = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True)
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     ticket_no = models.CharField(max_length=10, default="")
     description = models.TextField(max_length=500, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_user = models.CharField(max_length=50, blank=True, null=True)
+
+    objects = TicketManager()
 
     class Meta:
         ordering = ('customer', 'ticket_no')
