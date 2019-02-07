@@ -8,6 +8,7 @@ import router from './router'
 import store from './stores/store'
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
 Vue.use(ElementUI)
 
 /* eslint-disable no-new */

@@ -1,30 +1,6 @@
 <template>
   <el-container>
-    <el-aside width="180px">
-      <div class="logo-container">
-        <img :src="logoUrl"/>
-      </div>
-      <div>
-        <el-menu
-          default-active="2"
-          background-color="#545c64"
-          text-color="#fff"
-          active-text-color="#ffd04b">
-          <el-menu-item index="1">
-            <span slot="title">FD & Breakdown</span>
-          </el-menu-item>
-          <el-menu-item index="2">
-            <span slot="title">Support Log</span>
-          </el-menu-item>
-          <el-menu-item index="3">
-            <span slot="title">Todo List</span>
-          </el-menu-item>
-          <el-menu-item index="4">
-            <span slot="title">Reports</span>
-          </el-menu-item>
-        </el-menu>
-      </div>
-    </el-aside>
+    <Aside></Aside>
     <el-container>
       <el-header>
         <el-menu :default-active="activeIndex" mode="horizontal">
@@ -33,7 +9,6 @@
           <el-menu-item index="3"><a href="http://localhost:8000/admin" target="_blank">Admin</a></el-menu-item>
           <el-menu-item index="4" class="profile"><a href="http://localhost:8000/admin/password_change/" target="_blank">Change Password</a></el-menu-item>
         </el-menu>
-        <div class="line"></div>
       </el-header>
       <el-main>
         <el-breadcrumb separator-class="el-icon-arrow-right">
@@ -41,8 +16,11 @@
           <el-breadcrumb-item>Breakdown</el-breadcrumb-item>
           <el-breadcrumb-item>Ticket List</el-breadcrumb-item>
         </el-breadcrumb>
-        <el-button @click="resetDateFilter">清除日期过滤器</el-button>
-        <el-button @click="clearFilter">清除所有过滤器</el-button>
+        <div class="button-bar">
+          <el-button @click="openBreakdown" type="primary">Breakdown</el-button>
+          <el-button @click="editTicket" type="primary">Edit</el-button>
+          <el-button @click="deleteTicket" type="danger">Delete</el-button>
+        </div>
         <el-table
           ref="filterTable"
           :data="ticketList"
@@ -73,16 +51,28 @@
             width="100">
           </el-table-column>
         </el-table>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="totalCount"
+          @current-change="handleCurrentChange">
+        </el-pagination>
       </el-main>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import Aside from './Aside'
+import Header from './Header'
 import { mapState } from 'vuex'
 
 export default {
   name: 'Home',
+  components: {
+    Aside,
+    Header
+  },
   data () {
     return {
       msg: 'Welcome to iPROS management system.',
@@ -90,37 +80,33 @@ export default {
     }
   },
   mounted: function () {
-    this.$store.dispatch('loadTickets')
+    this.$store.dispatch('loadTickets', 1)
   },
   computed: {
     ...mapState({
-      ticketList: state => state.ticket.ticketList
+      ticketList: state => state.ticket.ticketList,
+      totalCount: state => state.ticket.totalCount
     })
+  },
+  methods: {
+    handleCurrentChange (page) {
+      this.$store.dispatch('loadTickets', page)
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.el-aside {
-  background-color: #545c64;
-  color: white;
-  min-height: 100vh;
-}
-.el-menu {
-  border-right: 0 !important;
-}
-.logo-container {
-  background-color: #003781;
-  min-height:12vh;
-}
+<style scoped>
 .el-main {
   background-color: #EEF1F4;
 }
-.el-menu-item {
-  text-align: left;
+.button-bar {
+  float: right;
+  padding-top: 2vh;
+  padding-bottom: 1vh;
 }
-.profile {
-  align-content: flex-end;
+.el-pagination {
+  margin-top: 2vh;
 }
 </style>

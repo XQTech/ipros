@@ -3,21 +3,23 @@ import axios from 'axios'
 export default {
 
   state: {
-    ticketList: []
+    ticketList: [],
+    totalCount: 0
   },
   mutations: {
-    SET_TICKETS (state, ticketList) {
-      state.ticketList = ticketList
+    SET_TICKETS (state, data) {
+      state.ticketList = data.results
+      state.totalCount = data.count
+      console.log('total Tickets: ' + state.totalCount)
     }
   },
   actions: {
-    loadTickets ({ commit }) {
-      axios.get('http://localhost:8000/breakdown/tickets/')
+    loadTickets ({commit}, page) {
+      axios.get('http://localhost:8000/breakdown/tickets/?page=' + page)
         .then(response => {
           console.log(response)
           console.log(response.data)
-          let ticketList = response.data.results
-          commit('SET_TICKETS', ticketList)
+          commit('SET_TICKETS', response.data)
         })
         .catch(error => {
           console.log(error)
