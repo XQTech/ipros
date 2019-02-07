@@ -38,7 +38,7 @@ class Ticket(models.Model):
     status = models.ForeignKey(Status, on_delete=models.PROTECT)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
     assigned_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+        settings.AUTH_USER_MODEL, related_name='tickets', on_delete=models.SET_NULL, null=True)
     ticket_no = models.CharField(max_length=10, default="")
     description = models.TextField(max_length=500, null=True, blank=True)
     start_date = models.DateField(null=True, blank=True)
@@ -67,7 +67,7 @@ class FunctionGroup(models.Model):
 
 class Breakdown(models.Model):
     ticket = models.ForeignKey(
-        Ticket, on_delete=models.PROTECT, related_name='breakdown')
+        Ticket, on_delete=models.PROTECT, related_name='breakdowns')
     function_group = models.ForeignKey(FunctionGroup, on_delete=models.PROTECT)
     description = models.TextField(max_length=500, null=True, blank=True)
     status = models.CharField(max_length=10, default=TaskStatus.NOT_STARTED)
