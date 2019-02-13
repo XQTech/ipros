@@ -5,12 +5,12 @@
       </div>
       <div>
         <el-menu
-          default-active="2"
+          default-active="1"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b">
           <el-menu-item index="1">
-            <span slot="title">FD & Breakdown</span>
+            <span slot="title" @click="loadTickets">Ticket List</span>
           </el-menu-item>
           <el-menu-item index="2">
             <span slot="title">Support Log</span>
@@ -33,6 +33,11 @@ export default {
   data () {
     return {
       logoUrl: './static/img/ipros.png'
+    }
+  },
+  methods: {
+    loadTickets () {
+      this.$store.dispatch('loadTickets', 1)
     }
   }
 }

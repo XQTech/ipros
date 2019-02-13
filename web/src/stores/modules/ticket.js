@@ -4,13 +4,21 @@ export default {
 
   state: {
     ticketList: [],
-    totalCount: 0
+    totalCount: 0,
+    showBreakdown: false,
+    selectedTicket: null
   },
   mutations: {
     SET_TICKETS (state, data) {
       state.ticketList = data.results
       state.totalCount = data.count
       console.log('total Tickets: ' + state.totalCount)
+      state.showBreakdown = false
+      state.selectedTicket = null
+    },
+    SHOW_BREAKDOWN (state, data) {
+      state.showBreakdown = true
+      state.selectedTicket = data
     }
   },
   actions: {
@@ -24,6 +32,9 @@ export default {
         .catch(error => {
           console.log(error)
         })
+    },
+    showBreakdown ({commit}, selectedTicket) {
+      commit('SHOW_BREAKDOWN', selectedTicket)
     }
   }
 }
