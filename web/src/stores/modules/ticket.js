@@ -23,6 +23,7 @@ export default {
   },
   actions: {
     loadTickets ({commit}, page) {
+      console.log('>>>loading ticket....')
       axios.get('http://localhost:8000/breakdown/tickets/?page=' + page)
         .then(response => {
           console.log(response)

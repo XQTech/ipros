@@ -1,8 +1,8 @@
-from breakdown.models import Ticket, Breakdown
+from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, Customer
 from breakdown import serializers as bds
 from breakdown.permissions import IsOwnerOrReadOnly
 from rest_framework import permissions, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from django.contrib.auth.models import User
@@ -32,7 +32,7 @@ class TicketViewSet(viewsets.ModelViewSet):
     """
     queryset = Ticket.objects.all()
     serializer_class = bds.TicketSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     #@action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
     #def highlight(self, request, *args, **kwargs):
@@ -51,7 +51,33 @@ class BreakdownViewSet(viewsets.ModelViewSet):
     
     queryset = Breakdown.objects.all()
     serializer_class = bds.BreakdownSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    #permission_classes = (IsOwnerOrReadOnly,)
 
     def perform_create(self, serializer):
-        serializer.save(create_user=self.request.user.username)
+        print("perform_create of breakdown in serializer...")
+        #serializer.save(create_user=self.request.user.username)
+        serializer.save(create_user='QQ')
+    
+    @action(detail=True)
+    def breakdowns(self, request, pk=None):
+        serializer = self.get_serializer(self.queryset.filter(ticket=pk), many=True)
+        return Response(serializer.data)
+
+
+class StatusViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Status.objects.all()
+    serializer_class = bds.StatusSerializer
+
+class FuncGroupsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = FunctionGroup.objects.all()
+    serializer_class = bds.FunctionGroupSerializer
+
+class CustomersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = bds.CustomerSerializer
+
+class UsersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = bds.UserSerializer
+
+

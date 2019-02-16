@@ -25,19 +25,20 @@ class FunctionGroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'description')
 
 class BreakdownSerializer(serializers.ModelSerializer):
-    ticket = serializers.ReadOnlyField(source='ticket.ticket_no')
-    function_group = FunctionGroupSerializer()
+    #ticket = serializers.ReadOnlyField(source='ticket.ticket_no')
+    #function_group = FunctionGroupSerializer()
     #status = StatusSerializer()
     class Meta:
         model = Breakdown
         fields = ('id', 'ticket', 'function_group', 'description', 'status',
                   'effort', 'create_date', 'create_user')
 
+
 class TicketSerializer(serializers.ModelSerializer):
-    breakdowns = BreakdownSerializer(many=True)
-    status = StatusSerializer()
-    customer = CustomerSerializer()
-    assigned_user = UserSerializer()
+    #breakdowns = BreakdownSerializer(many=True)
+    #status = StatusSerializer()
+    #customer = CustomerSerializer()
+    #assigned_user = UserSerializer()
 
     class Meta:
         model = Ticket

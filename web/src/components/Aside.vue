@@ -55,6 +55,6 @@ export default {
 }
 .logo-container {
   background-color: #003781;
-  min-height:12vh;
+  min-height:70px;
 }
 </style>

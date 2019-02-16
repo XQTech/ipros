@@ -15,14 +15,18 @@
         width="120">
       </el-table-column>
       <el-table-column
-        prop="customer.name"
         label="Customer"
         width="100">
+        <template slot-scope="scope">
+          <span>{{getCustomerbyID(scope.row.customer)}}</span>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="assigned_user.username"
         label="Assigned To"
         width="120">
+        <template slot-scope="scope">
+          <span>{{getUserbyID(scope.row.assigned_user)}}</span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="description"
@@ -31,7 +35,10 @@
       <el-table-column
         prop="status.code"
         label="Status"
-        width="80">
+        width="100">
+        <template slot-scope="scope">
+          <span>{{getStatusbyID(scope.row.status)}}</span>
+        </template>
       </el-table-column>
       <el-table-column
         prop="create_user"
@@ -42,11 +49,14 @@
         <template slot-scope="scope">
           <el-button
             size="mini"
-            @click="handleBreakdown(scope.row)">Breakdown</el-button>
+            type="primary"
+            icon="el-icon-more"
+            @click="handleBreakdown(scope.row)"></el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.row)">Delete</el-button>
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,8 +80,25 @@ export default {
   computed: {
     ...mapState({
       ticketList: state => state.ticket.ticketList,
-      totalCount: state => state.ticket.totalCount
-    })
+      totalCount: state => state.ticket.totalCount,
+      customers: state => state.customer.customers,
+      users: state => state.user.users
+    }),
+    getStatusbyID () {
+      return function (id) {
+        return this.$store.getters.getStatusById(id)
+      }
+    },
+    getCustomerbyID () {
+      return function (id) {
+        return this.$store.getters.getCustomerById(id)
+      }
+    },
+    getUserbyID () {
+      return function (id) {
+        return this.$store.getters.getUserById(id)
+      }
+    }
   },
   methods: {
     handleCurrentChange (page) {
@@ -80,6 +107,7 @@ export default {
     handleBreakdown (ticket) {
       console.log('ticket no: ' + ticket.ticket_no)
       console.log('breakdown: ' + ticket.breakdowns)
+      console.log('customer: ' + ticket.customer)
       this.$store.dispatch('showBreakdown', ticket)
     }
   }

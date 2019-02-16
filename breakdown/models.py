@@ -5,15 +5,6 @@ from enum import Enum
 
 
 # Create your models here.
-class TaskStatus(Enum):
-    NOT_STARTED = 1
-    IN_PROGRESS = 2
-    DONE = 3
-
-    def __str__(self):
-        return self.name
-
-
 class Status(models.Model):
     code = models.CharField(max_length=15)
 
@@ -28,12 +19,6 @@ class Customer(models.Model):
         return self.name
 
 
-class TicketManager(models.Manager):
-    def all_with_prefetch_breakdown(self):
-        qs = self.get_queryset()
-        return qs.prefetch_related('breakdown')
-
-
 class Ticket(models.Model):
     status = models.ForeignKey(Status, on_delete=models.PROTECT)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
@@ -45,8 +30,6 @@ class Ticket(models.Model):
     end_date = models.DateField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_user = models.CharField(max_length=50, blank=True, null=True)
-
-    objects = TicketManager()
 
     class Meta:
         ordering = ('customer', 'ticket_no')
@@ -70,7 +53,7 @@ class Breakdown(models.Model):
         Ticket, on_delete=models.PROTECT, related_name='breakdowns')
     function_group = models.ForeignKey(FunctionGroup, on_delete=models.PROTECT)
     description = models.TextField(max_length=500, null=True, blank=True)
-    status = models.CharField(max_length=10, default=TaskStatus.NOT_STARTED)
+    status = models.ForeignKey(Status, on_delete=models.PROTECT)
     effort = models.IntegerField(
         default=0, validators=[MaxValueValidator(500),
                                MinValueValidator(0)])

@@ -25,6 +25,10 @@ app_name = 'breakdown'
 router = DefaultRouter()
 router.register(r'tickets', views.TicketViewSet)
 router.register(r'breakdowns', views.BreakdownViewSet)
+router.register(r'status', views.StatusViewSet)
+router.register(r'funcgroups', views.FuncGroupsViewSet)
+router.register(r'customers', views.CustomersViewSet)
+router.register(r'users', views.UsersViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 

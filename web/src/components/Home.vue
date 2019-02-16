@@ -32,14 +32,25 @@ export default {
   data () {
     return {
       msg: 'Welcome to iPROS management system.',
-      logoUrl: './static/img/ipros.png'
+      logoUrl: './static/img/ipros.png',
+      activeIndex: '1'
     }
+  },
+  created: function () {
+    this.$store.dispatch('loadFuncGroup')
+    this.$store.dispatch('loadStatus')
+    this.$store.dispatch('loadCustomers')
   },
   computed: {
     ...mapState({
       showBreakdown: state => state.ticket.showBreakdown,
       selectedTicket: state => state.ticket.selectedTicket
     })
+  },
+  methods: {
+    handleSelect () {
+      console.log('handle select')
+    }
   }
 }
 </script>
