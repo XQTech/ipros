@@ -2,7 +2,7 @@
   <el-dialog title="Breakdown Details" :visible.sync="dialogFormVisible">
     <el-form :label-position="labelPosition" :model="selectedBreakdown">
       <el-form-item label="Function Group" :label-width="formLabelWidth">
-        <el-select v-model="selectedBreakdown.function_group" placeholder="------">
+        <el-select v-model="selectedBreakdown.function_group" placeholder="------" style="width: 100%;">
           <el-option v-for="func in funcGroups"
             v-bind:key="func.id"
             :label="func.description"
@@ -10,10 +10,10 @@
         </el-select>
       </el-form-item>
       <el-form-item label="Description" :label-width="formLabelWidth">
-        <el-input type="textarea" :rows="5" v-model="selectedBreakdown.description" style="width:400px"></el-input>
+        <el-input type="textarea" :rows="5" v-model="selectedBreakdown.description" style="width: 100%;"></el-input>
       </el-form-item>
       <el-form-item label="Status" :label-width="formLabelWidth">
-        <el-select v-model="selectedBreakdown.status" placeholder="------">
+        <el-select v-model="selectedBreakdown.status" placeholder="------" style="width: 100%;">
           <el-option v-for="status in statusList"
             v-bind:key="status.id"
             :label="status.code"
@@ -21,7 +21,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="Effort" :label-width="formLabelWidth">
-        <el-input-number v-model="selectedBreakdown.effort"></el-input-number>
+        <el-input-number v-model="selectedBreakdown.effort" style="width: 100%;"></el-input-number>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -33,6 +33,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getLoginUser } from '../../utils/auth'
 
 export default {
   name: 'Breakdown',
@@ -65,7 +66,8 @@ export default {
         function_group: 1,
         description: '',
         status: 1,
-        effort: 0
+        effort: 0,
+        create_user: getLoginUser()
       }
       this.isAdd = true
       this.dialogFormVisible = true
@@ -75,7 +77,6 @@ export default {
       if (this.isAdd) {
         this.$emit('createBreakdown', this.selectedBreakdown)
       } else {
-        // this.$store.dispatch('updateBreakdown', this.selectedBreakdown)
         this.$emit('updateBreakdown', this.selectedBreakdown)
       }
       this.dialogFormVisible = false
@@ -86,13 +87,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.el-form-item {
-  display: flex;
-}
-.el-select, .el-input-number {
-  width: 400px;
-}
-.el-form {
-  margin-left: 10px;
-}
+
 </style>

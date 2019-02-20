@@ -13,7 +13,7 @@ export default {
   actions: {
     loadStatus ({commit}) {
       console.log('>>>loading status....')
-      axios.get('http://localhost:8000/breakdown/status/')
+      axios.get('http://localhost:8000/api/status/')
         .then(response => {
           console.log(response)
           console.log(response.data)

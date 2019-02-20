@@ -8,7 +8,6 @@ class StatusSerializer(serializers.ModelSerializer):
         model = Status
         fields = ('id', 'code')
 
-
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
@@ -25,26 +24,15 @@ class FunctionGroupSerializer(serializers.ModelSerializer):
         fields = ('id', 'description')
 
 class BreakdownSerializer(serializers.ModelSerializer):
-    #ticket = serializers.ReadOnlyField(source='ticket.ticket_no')
-    #function_group = FunctionGroupSerializer()
-    #status = StatusSerializer()
     class Meta:
         model = Breakdown
-        fields = ('id', 'ticket', 'function_group', 'description', 'status',
-                  'effort', 'create_date', 'create_user')
+        fields = '__all__'
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    #breakdowns = BreakdownSerializer(many=True)
-    #status = StatusSerializer()
-    #customer = CustomerSerializer()
-    #assigned_user = UserSerializer()
-
     class Meta:
         model = Ticket
-        #fields = '__all__'
-        fields = ('id', 'status', 'customer', 'assigned_user', 'ticket_no',
-                  'description', 'create_user', 'breakdowns')
+        fields = '__all__'
 
 
 

@@ -13,7 +13,7 @@ export default {
   actions: {
     loadCustomers ({commit}) {
       console.log('>>>loading customers....')
-      axios.get('http://localhost:8000/breakdown/customers/')
+      axios.get('http://localhost:8000/api/customers/')
         .then(response => {
           console.log(response)
           console.log(response.data)

@@ -2,9 +2,8 @@
   <el-main>
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }" @click.native="goHome">Home</el-breadcrumb-item>
-      <el-breadcrumb-item>Ticket List</el-breadcrumb-item>
+      <el-breadcrumb-item>Ticket ({{ selectedTicket.ticket_no }})</el-breadcrumb-item>
       <el-breadcrumb-item>Breakdown</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ selectedTicket.ticket_no }}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="button-bar">
       <el-button
@@ -81,6 +80,7 @@
 <script>
 import Breakdown from './Breakdown'
 import axios from 'axios'
+import { getAccessToken } from '../../utils/auth'
 
 export default {
   name: 'Breakdowns',
@@ -115,7 +115,7 @@ export default {
       this.$store.dispatch('loadTickets', 1)
     },
     loadBreakdowns () {
-      axios.get('http://localhost:8000/breakdown/breakdowns/' + this.selectedTicket.id + '/breakdowns/')
+      axios.get('http://localhost:8000/api/breakdowns/' + this.selectedTicket.id + '/breakdowns/')
         .then(response => {
           console.log('printing result from api.....')
           console.log(response)
@@ -142,38 +142,43 @@ export default {
     },
     createBreakdown (breakdown) {
       console.log('>>>create breakdown....')
-      console.log(breakdown)
-      axios.post('http://localhost:8000/breakdown/breakdowns/', breakdown)
+      axios.post('http://localhost:8000/api/breakdowns/', breakdown, {
+        // headers: { 'X-CSRFToken': this.$store.state.constants.csrToken
+        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+          'X-CSRFToken': this.$store.state.constants.csrToken
+        }})
         .then(response => {
-          console.log('posting the data to api....')
-          console.log(response)
-          console.log(response.data)
+          this.$message.success('Create successfully')
           this.loadBreakdowns()
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     },
     updateBreakdown (breakdown) {
       console.log('>>>update breakdown....')
-      axios.put('http://localhost:8000/breakdown/breakdowns/' + breakdown.id + '/', breakdown)
+      axios.put('http://localhost:8000/api/breakdowns/' + breakdown.id + '/', breakdown, {
+        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+          'X-CSRFToken': this.$store.state.constants.csrToken
+        }})
         .then(response => {
-          console.log(response)
-          console.log(response.data)
+          this.$message.success('Update successfully')
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     },
     deleteBreakdown (breakdownId) {
       console.log('>>>delete breakdown....' + breakdownId)
-      axios.delete('http://localhost:8000/breakdown/breakdowns/' + breakdownId + '/')
+      axios.delete('http://localhost:8000/api/breakdowns/' + breakdownId + '/', {
+        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+          'X-CSRFToken': this.$store.state.constants.csrToken
+        }})
         .then(response => {
-          console.log(response)
-          console.log(response.data)
+          this.$message.success('Delete successfully')
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     }
   }

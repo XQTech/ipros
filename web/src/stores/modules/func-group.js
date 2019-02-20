@@ -13,7 +13,7 @@ export default {
   actions: {
     loadFuncGroup ({commit}) {
       console.log('>>>loading function group....')
-      axios.get('http://localhost:8000/breakdown/funcgroups/')
+      axios.get('http://localhost:8000/api/funcgroups/')
         .then(response => {
           console.log(response)
           console.log(response.data)

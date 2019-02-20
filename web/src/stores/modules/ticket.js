@@ -24,7 +24,7 @@ export default {
   actions: {
     loadTickets ({commit}, page) {
       console.log('>>>loading ticket....')
-      axios.get('http://localhost:8000/breakdown/tickets/?page=' + page)
+      axios.get('http://localhost:8000/api/tickets/?page=' + page)
         .then(response => {
           console.log(response)
           console.log(response.data)
@@ -36,6 +36,21 @@ export default {
     },
     showBreakdown ({commit}, selectedTicket) {
       commit('SHOW_BREAKDOWN', selectedTicket)
+    },
+    searchTickets ({commit}, searchKeys) {
+      let url = 'http://localhost:8000/api/tickets/?page=1'
+      for (var key in searchKeys) {
+        url += '&' + key + '=' + searchKeys[key]
+      }
+      axios.get(url)
+        .then(response => {
+          console.log(response)
+          console.log(response.data)
+          commit('SET_TICKETS', response.data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
   }
 }

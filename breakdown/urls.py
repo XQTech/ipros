@@ -31,9 +31,9 @@ router.register(r'customers', views.CustomersViewSet)
 router.register(r'users', views.UsersViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
-
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('schema/', schema_view),
     path('', include(router.urls)),
+    path('jira/', views.JiraView.as_view(), name="jira-list"),
 ]
