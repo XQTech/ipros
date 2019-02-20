@@ -112,7 +112,11 @@ export default {
   },
   methods: {
     goHome () {
-      this.$store.dispatch('loadTickets', 1)
+      let params = {
+        keys: null,
+        page: 1
+      }
+      this.$store.dispatch('loadTickets', params)
     },
     loadBreakdowns () {
       axios.get('http://localhost:8000/api/breakdowns/' + this.selectedTicket.id + '/breakdowns/')

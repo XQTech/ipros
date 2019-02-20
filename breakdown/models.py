@@ -89,9 +89,9 @@ class Breakdown(models.Model):
                                MinValueValidator(0)])
     assigned_user = models.ForeignKey(
          settings.AUTH_USER_MODEL, related_name='breakdowns', on_delete=models.SET_NULL, null=True)
-    image1 = models.CharField(max_length=100, default="")
-    image2 = models.CharField(max_length=100, default="")
-    image3 = models.CharField(max_length=100, default="")
+    image1 = models.CharField(max_length=100, null=True, blank=True)
+    image2 = models.CharField(max_length=100, null=True, blank=True)
+    image3 = models.CharField(max_length=100, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_user = models.CharField(max_length=50, blank=True, null=True)

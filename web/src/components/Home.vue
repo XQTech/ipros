@@ -68,7 +68,11 @@ export default {
       this.$router.push({ name: 'Login' })
     },
     loadTickets () {
-      this.$store.dispatch('loadTickets', 1)
+      let params = {
+        keys: null,
+        page: this.page
+      }
+      this.$store.dispatch('loadTickets', params)
     }
   }
 }
