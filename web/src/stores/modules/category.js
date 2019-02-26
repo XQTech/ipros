@@ -3,21 +3,21 @@ import axios from 'axios'
 export default {
 
   state: {
-    customers: []
+    categories: []
   },
   mutations: {
-    SET_CUSTOMER (state, data) {
-      state.customers = data.results
+    SET_CATEGORY (state, data) {
+      state.categories = data.results
     }
   },
   actions: {
     loadCustomers ({commit}) {
-      console.log('>>>loading customers....')
-      axios.get('http://localhost:8000/api/customers/')
+      console.log('>>>loading category....')
+      axios.get('http://localhost:8000/api/categories/')
         .then(response => {
           console.log(response)
           console.log(response.data)
-          commit('SET_CUSTOMER', response.data)
+          commit('SET_CATEGORY', response.data)
         })
         .catch(error => {
           console.log(error)
@@ -25,11 +25,11 @@ export default {
     }
   },
   getters: {
-    getCustomerById: (state) => (id) => {
+    getCategoryById: (state) => (id) => {
       if (!id) {
         return ''
       }
-      return state.customers.find(ct => ct.id === id).name
+      return state.categories.find(ct => ct.id === id).code
     }
   }
 }

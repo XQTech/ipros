@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import renderers
 from rest_framework.routers import DefaultRouter
@@ -29,6 +30,7 @@ router.register(r'status', views.StatusViewSet)
 router.register(r'funcgroups', views.FuncGroupsViewSet)
 router.register(r'customers', views.CustomersViewSet)
 router.register(r'users', views.UsersViewSet)
+router.register(r'categories', views.CategoryViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 # The API URLs are now determined automatically by the router.
@@ -36,4 +38,6 @@ urlpatterns = [
     path('schema/', schema_view),
     path('', include(router.urls)),
     path('jira/', views.JiraView.as_view(), name="jira-list"),
+    url(r'^breakdowns/image/(?P<pk>[0-9]+)/$', views.UploadImageView.as_view(), name="upload-image"),
+    
 ]

@@ -1,28 +1,60 @@
 <template>
-  <el-dialog title="Breakdown Details" :visible.sync="dialogFormVisible">
+  <el-dialog title="Breakdown Details" :visible.sync="dialogFormVisible" center width="80%">
     <el-form :label-position="labelPosition" :model="selectedBreakdown">
-      <el-form-item label="Function Group" :label-width="formLabelWidth">
-        <el-select v-model="selectedBreakdown.function_group" placeholder="------" style="width: 100%;">
-          <el-option v-for="func in funcGroups"
-            v-bind:key="func.id"
-            :label="func.description"
-            :value="func.id"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Description" :label-width="formLabelWidth">
-        <el-input type="textarea" :rows="5" v-model="selectedBreakdown.description" style="width: 100%;"></el-input>
-      </el-form-item>
-      <el-form-item label="Status" :label-width="formLabelWidth">
-        <el-select v-model="selectedBreakdown.status" placeholder="------" style="width: 100%;">
-          <el-option v-for="status in statusList"
-            v-bind:key="status.id"
-            :label="status.code"
-            :value="status.id"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Effort" :label-width="formLabelWidth">
-        <el-input-number v-model="selectedBreakdown.effort" style="width: 100%;"></el-input-number>
-      </el-form-item>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="Sequence" :label-width="formLabelWidth">
+            <el-input-number v-model="selectedBreakdown.sequence"></el-input-number>
+          </el-form-item>
+          <el-form-item label="Category" :label-width="formLabelWidth">
+            <el-select v-model="selectedBreakdown.category" placeholder="------">
+              <el-option v-for="cat in categories"
+                v-bind:key="cat.id"
+                :label="cat.code"
+                :value="cat.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Function Group" :label-width="formLabelWidth">
+            <el-select v-model="selectedBreakdown.function_group" placeholder="------">
+              <el-option v-for="func in funcGroups"
+                v-bind:key="func.id"
+                :label="func.description"
+                :value="func.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Description" :label-width="formLabelWidth">
+            <el-input type="textarea" :rows="6" v-model="selectedBreakdown.description" style="width:80%;"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="Status" :label-width="formLabelWidth">
+            <el-select v-model="selectedBreakdown.status" placeholder="------">
+              <el-option v-for="status in statusList"
+                v-bind:key="status.id"
+                :label="status.code"
+                :value="status.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Assigned To" :label-width="formLabelWidth">
+            <el-select v-model="selectedBreakdown.assigned_user" placeholder="------">
+              <el-option v-for="user in users"
+                v-bind:key="user.id"
+                :label="user.username"
+                :value="user.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Effort" :label-width="formLabelWidth">
+            <el-input-number v-model="selectedBreakdown.effort"></el-input-number>
+          </el-form-item>
+          <el-form-item label="Due Date" :label-width="formLabelWidth">
+            <el-date-picker
+              v-model="selectedBreakdown.due_date"
+              type="date"
+              placeholder="Due Date">
+            </el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="dialogFormVisible = false">Cancel</el-button>
@@ -50,7 +82,9 @@ export default {
   computed: {
     ...mapState({
       statusList: state => state.ticketStatus.statusList,
-      funcGroups: state => state.funcGroups.functionGroups
+      funcGroups: state => state.funcGroups.functionGroups,
+      categories: state => state.category.categories,
+      users: state => state.user.users
     })
   },
   methods: {
@@ -63,10 +97,17 @@ export default {
     addBreakdown (selectedTicket) {
       this.selectedBreakdown = {
         ticket: selectedTicket.id,
+        sequence: 1,
+        category: 1,
         function_group: 1,
         description: '',
         status: 1,
         effort: 0,
+        assigned_user: 1,
+        image1: '',
+        image2: '',
+        image3: '',
+        due_date: '',
         create_user: getLoginUser()
       }
       this.isAdd = true
@@ -87,5 +128,16 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-
+.el-input-number{
+  width: 80%;
+}
+.el-select {
+  width: 80%;
+}
+.el-input {
+  width: 80%;
+}
+.el-date-picker {
+  width: 80%;
+}
 </style>

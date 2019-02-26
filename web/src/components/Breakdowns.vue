@@ -16,9 +16,20 @@
       :data="breakdowns"
       style="width: 100%">
       <el-table-column
+        prop="sequence"
+        label="SN"
+        width="50">
+      </el-table-column>
+      <el-table-column
+        label="Category"
+        width="100">
+        <template slot-scope="scope">
+          <span>{{getCategorybyID(scope.row.category)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="Function"
-        sortable
-        width="180">
+        width="120">
         <template slot-scope="scope">
           <span>{{getFuncGroupbyID(scope.row.function_group)}}</span>
         </template>
@@ -40,8 +51,15 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="create_user"
-        label="Created By"
+        label="Assigned To"
+        width="120">
+        <template slot-scope="scope">
+          <span>{{getUserbyID(scope.row.assigned_user)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="due_date"
+        label="Due Date"
         width="100">
       </el-table-column>
       <el-table-column label="Action" width="200">
@@ -51,6 +69,11 @@
             type="primary"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"></el-button>
+          <el-button
+          size="mini"
+          type="primary"
+          icon="el-icon-picture"
+          @click="handleUpdateImage(scope.row)"></el-button>
           <el-popover
             placement="top"
             width="160"
@@ -74,18 +97,22 @@
       v-on:createBreakdown="createBreakdown"
       v-on:updateBreakdown="updateBreakdown"
       v-on:deleteBreakdown="deleteBreakdown"></Breakdown>
+    <UploadImage
+      ref="imageForm"></UploadImage>
   </el-main>
 </template>
 
 <script>
 import Breakdown from './Breakdown'
+import UploadImage from './UploadImage'
 import axios from 'axios'
 import { getAccessToken } from '../../utils/auth'
 
 export default {
   name: 'Breakdowns',
   components: {
-    Breakdown
+    Breakdown,
+    UploadImage
   },
   props: ['selectedTicket'],
   data () {
@@ -107,6 +134,16 @@ export default {
     getFuncGroupbyID () {
       return function (id) {
         return this.$store.getters.getFuncGroupById(id)
+      }
+    },
+    getCategorybyID () {
+      return function (id) {
+        return this.$store.getters.getCategoryById(id)
+      }
+    },
+    getUserbyID () {
+      return function (id) {
+        return this.$store.getters.getUserById(id)
       }
     }
   },
@@ -143,6 +180,9 @@ export default {
     handleCreate () {
       console.log('creating breakdown.....open form....')
       this.$refs.breakdownForm.addBreakdown(this.selectedTicket)
+    },
+    handleUpdateImage (breakdown) {
+      this.$refs.imageForm.showImageForm(breakdown)
     },
     createBreakdown (breakdown) {
       console.log('>>>create breakdown....')

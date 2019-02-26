@@ -1,7 +1,8 @@
-from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, Customer
+from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, Customer, BreakdownCategory
 from breakdown import serializers as bds
 from breakdown.permissions import IsOwnerOrReadOnly
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status
+from django.http import Http404
 from rest_framework.decorators import action, api_view, action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
@@ -14,6 +15,8 @@ from django.contrib.auth.models import User
 from .filters import TicketFilter
 from jira import JIRA
 from django.views import View
+from django.conf import settings
+import os
 
 
 @api_view(['GET'])
@@ -48,17 +51,61 @@ class BreakdownViewSet(viewsets.ModelViewSet):
     queryset = Breakdown.objects.all()
     serializer_class = bds.BreakdownSerializer
     #permission_classes = (IsOwnerOrReadOnly,)
-
-    def perform_create(self, serializer):
-        print("perform_create of breakdown in serializer...")
-        #serializer.save(create_user=self.request.user.username)
-        serializer.save()
-
     
+    # def pre_save(self, obj):
+    #     print(obj)
+    #     if (obj.image1 == None):
+    #         obj.image1 = self.request.FILES.get('file')
+    #     elif (obj.image2 == None):
+    #         obj.image2 = self.request.FILES.get('file')
+    #     elif (obj.image3 == None):
+    #         obj.image3 = self.request.FILES.get('file')
+
     @action(detail=True)
     def breakdowns(self, request, pk=None):
         serializer = self.get_serializer(self.queryset.filter(ticket=pk), many=True)
         return Response(serializer.data)
+
+class UploadImageView(APIView):
+    def get_object(self, pk):
+        try:
+            return Breakdown.objects.get(pk=pk)
+        except Breakdown.DoesNotExist:
+            raise Http404
+
+    def put(self, request, pk, format=None):    
+        bk = self.get_object(pk)
+        print(self.request.FILES.get('file'))     
+        if (bk.image1 == ''):          
+            bk.image1 = self.request.FILES.get('file')
+        elif (bk.image2 == ''):
+            bk.image2 = self.request.FILES.get('file')
+        elif (bk.image3 == ''):
+            bk.image3 = self.request.FILES.get('file')
+        bk.save()
+        bks = bds.BreakdownSerializer(bk)
+        return Response(bks.data)
+    
+    def delete(self, request, pk, format=None):
+        filename = self.request.query_params.get('name')
+        bk = self.get_object(pk)
+        if (bk.image1.url.endswith(filename)):
+            os.remove(settings.MEDIA_ROOT + bk.image1.url)
+            bk.image1 = ''
+        elif (bk.image2.url.endswith(filename)):
+            os.remove(settings.MEDIA_ROOT + bk.image2.url)
+            bk.image2 = ''
+        elif (bk.image3.url.endswith(filename)):
+            os.remove(settings.MEDIA_ROOT + bk.image3.url)
+            bk.image3 = ''
+
+        bk.save()
+        return Response('{success:true}')
+
+    # def delete(self, request, pk, format=None):
+    #     snippet = self.get_object(pk)
+    #     snippet.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class StatusViewSet(viewsets.ReadOnlyModelViewSet):
@@ -76,6 +123,10 @@ class CustomersViewSet(viewsets.ReadOnlyModelViewSet):
 class UsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = bds.UserSerializer
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = BreakdownCategory.objects.all()
+    serializer_class = bds.CategorySerializer
 
 # For auth with JWT
 class RestrictedView(APIView):

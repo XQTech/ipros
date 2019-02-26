@@ -26,6 +26,9 @@ export default {
   },
   getters: {
     getStatusById: (state) => (id) => {
+      if (!id) {
+        return ''
+      }
       return state.statusList.find(status => status.id === id).code
     }
   }

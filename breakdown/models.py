@@ -76,6 +76,10 @@ class Ticket(models.Model):
         return '{} / {} / {}'.format(self.customer, self.ticket_no,
                                      self.status)
 
+
+def upload_path_handler(instance, filename):
+    return 'breakdownimage/' + instance.ticket.ticket_no + '/' + filename
+    
 class Breakdown(models.Model):
     sequence = models.IntegerField(default=0)
     category = models.ForeignKey(BreakdownCategory, null=True, on_delete=models.SET_NULL)
@@ -89,9 +93,9 @@ class Breakdown(models.Model):
                                MinValueValidator(0)])
     assigned_user = models.ForeignKey(
          settings.AUTH_USER_MODEL, related_name='breakdowns', on_delete=models.SET_NULL, null=True)
-    image1 = models.CharField(max_length=100, null=True, blank=True)
-    image2 = models.CharField(max_length=100, null=True, blank=True)
-    image3 = models.CharField(max_length=100, null=True, blank=True)
+    image1 = models.ImageField(upload_to=upload_path_handler, null=True, blank=True)
+    image2 = models.ImageField(upload_to=upload_path_handler, null=True, blank=True)
+    image3 = models.ImageField(upload_to=upload_path_handler, null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_user = models.CharField(max_length=50, blank=True, null=True)

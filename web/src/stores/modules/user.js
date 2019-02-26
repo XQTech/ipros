@@ -26,6 +26,9 @@ export default {
   },
   getters: {
     getUserById: (state) => (id) => {
+      if (!id) {
+        return ''
+      }
       return state.users.find(user => user.id === id).username
     }
   }

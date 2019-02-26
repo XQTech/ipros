@@ -26,6 +26,9 @@ export default {
   },
   getters: {
     getFuncGroupById: (state) => (id) => {
+      if (!id) {
+        return ''
+      }
       return state.functionGroups.find(fg => fg.id === id).description
     }
   }

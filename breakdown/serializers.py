@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from breakdown.models import Ticket, Breakdown, Customer, Status, FunctionGroup
+from breakdown.models import Ticket, Breakdown, Customer, Status, FunctionGroup, BreakdownCategory
 from django.contrib.auth.models import User
+from rest_framework.decorators import detail_route
 
 
 class StatusSerializer(serializers.ModelSerializer):
@@ -28,10 +29,14 @@ class BreakdownSerializer(serializers.ModelSerializer):
         model = Breakdown
         fields = '__all__'
 
-
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
+        fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BreakdownCategory
         fields = '__all__'
 
 
