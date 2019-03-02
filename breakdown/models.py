@@ -78,7 +78,7 @@ class Ticket(models.Model):
 
 
 def upload_path_handler(instance, filename):
-    return 'breakdownimage/' + instance.ticket.ticket_no + '/' + filename
+    return 'breakdown/' + instance.ticket.ticket_no + '/' + filename
     
 class Breakdown(models.Model):
     sequence = models.IntegerField(default=0)

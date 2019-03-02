@@ -21,6 +21,9 @@
         <el-input placeholder="Description" v-model="searchKeys.summary__icontains" style="width:300px;"></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input placeholder="GN" v-model="searchKeys.gn_no__icontains"></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" @click="loadTicket(1)">Search</el-button>
       </el-form-item>
       <el-form-item>
@@ -77,13 +80,29 @@
         width="100"
         sortable>
       </el-table-column>
-      <el-table-column label="Action" width="100">
+      <el-table-column
+        label="Documents"
+        width="200">
+        <template slot-scope="scope">
+          <a :href="getDocPath(scope.row)"
+            class="buttonText" download>{{getDocName(scope.row)[0]}}</a><br>
+          <a :href="getXlxPath(scope.row)"
+            class="buttonText" download>{{getDocName(scope.row)[1]}}</a>
+        </template>
+      </el-table-column>
+      <el-table-column label="Action" width="150">
         <template slot-scope="scope">
           <el-button
             size="mini"
             type="primary"
             icon="el-icon-more"
             @click="handleBreakdown(scope.row)"></el-button>
+          <el-button
+          size="mini"
+          type="primary"
+          icon="el-icon-document"
+          @click="handleGenerateDoc(scope.row, scope.$index)"
+          :loading="generating[scope.$index]"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,6 +119,7 @@
 import { mapState } from 'vuex'
 import { getAccessToken } from '../../utils/auth'
 import { api } from '../../utils/api'
+import axios from 'axios'
 
 export default {
   name: 'Tickets',
@@ -126,7 +146,8 @@ export default {
       ],
       progressVisible: false,
       oldCount: 0,
-      newCount: 0
+      newCount: 0,
+      generating: []
     }
   },
   computed: {
@@ -135,7 +156,8 @@ export default {
       totalCount: state => state.ticket.totalCount,
       customers: state => state.customer.customers,
       users: state => state.user.users,
-      statusList: state => state.ticketStatus.statusList
+      statusList: state => state.ticketStatus.statusList,
+      docList: state => state.ticket.docList
     })
   },
   methods: {
@@ -144,7 +166,38 @@ export default {
         keys: this.searchKeys,
         page: page
       }
+      this.$store.dispatch('loadDocs')
       this.$store.dispatch('loadTickets', params)
+    },
+    handleGenerateDoc (ticket, index) {
+      this.generating[index] = true
+      axios.get('http://localhost:8000/api/breakdowns/doc/' + ticket.id + '/')
+        .then(response => {
+          this.generating = []
+          console.log(response.data)
+          this.$store.dispatch('loadDocs')
+          this.$message.success('Documents created !')
+        })
+        .catch(error => {
+          this.generating = []
+          this.$message.error(error.message)
+        })
+    },
+    getDocName (ticket) {
+      var i
+      for (i in this.docList) {
+        let doc = this.docList[i]
+        if (doc.ticket === ticket.ticket_no) {
+          return doc.docs
+        }
+      }
+      return ''
+    },
+    getDocPath (ticket) {
+      return './static/media/breakdown/' + ticket.ticket_no + '/FD-' + ticket.ticket_no + '.docx'
+    },
+    getXlxPath (ticket) {
+      return './static/media/breakdown/' + ticket.ticket_no + '/Breakdown-' + ticket.ticket_no + '.xlsx'
     },
     handleBreakdown (ticket) {
       this.$store.dispatch('showBreakdown', ticket)
@@ -161,8 +214,6 @@ export default {
       let url = 'http://localhost:8000/api/jira/'
       let res = await api.get(url)
       console.log(res)
-      // let updatedTickets = []
-      // let newTickets = []
       let ticketUrl = 'http://localhost:8000/api/tickets/'
       let header = { 'X-Authorization': 'JWT ' + getAccessToken(),
         'X-CSRFToken': this.$store.state.constants.csrToken
@@ -171,7 +222,6 @@ export default {
         this.retreiveTicket(issue)
           .then(response => {
             if (response) {
-              // updatedTickets.push(this.getUpdatedTicket(issue, response))
               let ticket = this.getUpdatedTicket(issue, response)
               let putUrl = ticketUrl + ticket.id + '/'
               api.put(putUrl, ticket, header)
@@ -180,7 +230,6 @@ export default {
                 })
               this.oldCount++
             } else {
-              // newTickets.push(this.getNewTicket(issue))
               api.post(ticketUrl, this.getNewTicket(issue), header)
                 .catch(error => {
                   console.log(error)
@@ -193,7 +242,6 @@ export default {
           })
       })
       setTimeout(() => {
-        // this.syncTicket(updatedTickets, newTickets)
         this.loadTicket(1)
         this.progressVisible = false
         this.$message.success('Updated ' + this.oldCount + ' Tickets, Created ' + this.newCount + ' Tickets')
@@ -211,18 +259,6 @@ export default {
     getUpdatedTicket (jiraIssue, ticket) {
       return this.setTicket(jiraIssue, ticket)
     },
-    // async syncTicket (updatedTickets, newTickets) {
-    //   let url = 'http://localhost:8000/api/tickets/'
-    //   let header = { 'X-Authorization': 'JWT ' + getAccessToken(),
-    //     'X-CSRFToken': this.$store.state.constants.csrToken
-    //   }
-    //   if (updatedTickets && updatedTickets.length > 0) {
-    //     await api.put(url, updatedTickets, header)
-    //   }
-    //   if (newTickets && newTickets.length > 0) {
-    //     await api.post(url, newTickets, header)
-    //   }
-    // },
     getNewTicket (jiraIssue) {
       let ticket = {
         status: '',

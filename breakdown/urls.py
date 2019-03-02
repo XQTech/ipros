@@ -39,5 +39,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('jira/', views.JiraView.as_view(), name="jira-list"),
     url(r'^breakdowns/image/(?P<pk>[0-9]+)/$', views.UploadImageView.as_view(), name="upload-image"),
-    
+    url(r'^breakdowns/doc/(?P<pk>[0-9]+)/$', views.GenerateDocView.as_view(), name="generate-doc"),
+    path('docs/', views.DocumentListView.as_view(), name="doc-list"),
+    # path('docs/<slug:slug>/', views.DocumentListView.as_view(), name="get-doc"),
 ]

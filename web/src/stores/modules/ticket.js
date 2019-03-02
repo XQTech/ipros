@@ -6,7 +6,8 @@ export default {
     ticketList: [],
     totalCount: 0,
     showBreakdown: false,
-    selectedTicket: null
+    selectedTicket: null,
+    docList: {}
   },
   mutations: {
     SET_TICKETS (state, data) {
@@ -15,6 +16,9 @@ export default {
       console.log('total Tickets: ' + state.totalCount)
       state.showBreakdown = false
       state.selectedTicket = null
+    },
+    SET_DOCS (state, data) {
+      state.docList = data
     },
     SHOW_BREAKDOWN (state, data) {
       state.showBreakdown = true
@@ -35,6 +39,19 @@ export default {
           console.log(response)
           console.log(response.data)
           commit('SET_TICKETS', response.data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+    loadDocs ({commit}, params) {
+      console.log('>>>loading docs....')
+      axios.get('http://localhost:8000/api/docs/')
+        .then(response => {
+          console.log('docs list.............')
+          console.log(response)
+          console.log(response.data)
+          commit('SET_DOCS', response.data)
         })
         .catch(error => {
           console.log(error)

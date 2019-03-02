@@ -72,6 +72,7 @@ export default {
         keys: null,
         page: this.page
       }
+      this.$store.dispatch('loadDocs')
       this.$store.dispatch('loadTickets', params)
     }
   }

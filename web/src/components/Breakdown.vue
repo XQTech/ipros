@@ -23,7 +23,8 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Description" :label-width="formLabelWidth">
-            <el-input type="textarea" :rows="6" v-model="selectedBreakdown.description" style="width:80%;"></el-input>
+            <el-input type="textarea" :rows="6" v-model="selectedBreakdown.description" style="width:80%;"
+            placeholder="Add short description between '{' and '}' to be used in effort excel"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -50,6 +51,7 @@
             <el-date-picker
               v-model="selectedBreakdown.due_date"
               type="date"
+              value-format="yyyy-MM-dd"
               placeholder="Due Date">
             </el-date-picker>
           </el-form-item>
@@ -104,10 +106,10 @@ export default {
         status: 1,
         effort: 0,
         assigned_user: 1,
-        image1: '',
-        image2: '',
-        image3: '',
-        due_date: '',
+        image1: null,
+        image2: null,
+        image3: null,
+        due_date: null,
         create_user: getLoginUser()
       }
       this.isAdd = true

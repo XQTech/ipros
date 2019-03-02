@@ -98,7 +98,8 @@
       v-on:updateBreakdown="updateBreakdown"
       v-on:deleteBreakdown="deleteBreakdown"></Breakdown>
     <UploadImage
-      ref="imageForm"></UploadImage>
+      ref="imageForm"
+      v-on:loadBreakdowns="loadBreakdowns"></UploadImage>
   </el-main>
 </template>
 
@@ -153,6 +154,7 @@ export default {
         keys: null,
         page: 1
       }
+      this.$store.dispatch('loadDocs')
       this.$store.dispatch('loadTickets', params)
     },
     loadBreakdowns () {
@@ -186,8 +188,8 @@ export default {
     },
     createBreakdown (breakdown) {
       console.log('>>>create breakdown....')
+      console.log(breakdown)
       axios.post('http://localhost:8000/api/breakdowns/', breakdown, {
-        // headers: { 'X-CSRFToken': this.$store.state.constants.csrToken
         headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': this.$store.state.constants.csrToken
         }})
@@ -200,8 +202,21 @@ export default {
         })
     },
     updateBreakdown (breakdown) {
+      let tempBreakdown = {
+        id: breakdown.id,
+        ticket: breakdown.ticket,
+        sequence: breakdown.sequence,
+        category: breakdown.category,
+        function_group: breakdown.function_group,
+        description: breakdown.description,
+        status: breakdown.status,
+        effort: breakdown.effort,
+        assigned_user: breakdown.assigned_user,
+        due_date: breakdown.due_date,
+        create_user: breakdown.create_user
+      }
       console.log('>>>update breakdown....')
-      axios.put('http://localhost:8000/api/breakdowns/' + breakdown.id + '/', breakdown, {
+      axios.put('http://localhost:8000/api/breakdowns/' + breakdown.id + '/', tempBreakdown, {
         headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': this.$store.state.constants.csrToken
         }})

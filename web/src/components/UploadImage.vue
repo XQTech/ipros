@@ -63,6 +63,9 @@ export default {
     showImageForm (selectedBreakdown) {
       this.dialogFormVisible = true
       this.selectedBreakdown = selectedBreakdown
+      console.log(this.selectedBreakdown.image1)
+      console.log(this.selectedBreakdown.image2)
+      console.log(this.selectedBreakdown.image3)
     },
     handleRemove (file, fileList) {
       console.log('deleting image...')
@@ -73,7 +76,7 @@ export default {
         }})
         .then(response => {
           console.log(response.data)
-          this.$emit('loadBreakdown', this.selectedBreakdown)
+          // this.$emit('loadBreakdowns')
         })
         .catch(error => {
           console.log(error)
@@ -101,6 +104,7 @@ export default {
         }})
         .then(response => {
           console.log(response.data)
+          // this.$emit('loadBreakdowns')
         })
         .catch(error => {
           console.log(error)
