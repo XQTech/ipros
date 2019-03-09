@@ -1,11 +1,10 @@
 import axios from 'axios'
 const api = {
-  async get (url, data, header) {
+  async get (url) {
     try {
-      let res = await axios.get(url, JSON.stringify(data), {headers: header})
+      let res = await axios.get(url)
       res = res.data
       console.log('in api, geting data....')
-      console.log(header)
       return new Promise((resolve) => {
         resolve(res)
       })

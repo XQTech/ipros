@@ -12,13 +12,6 @@ class Status(models.Model):
         return self.code
 
 
-class Customer(models.Model):
-    name = models.CharField(max_length=15)
-
-    def __str__(self):
-        return self.name
-
-
 # class Ticket(models.Model):
 #     status = models.ForeignKey(Status, on_delete=models.PROTECT)
 #     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)

@@ -1,7 +1,7 @@
 <template>
-  <el-main>
+  <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">Home</el-breadcrumb-item>
+      <el-breadcrumb-item>Breakdown</el-breadcrumb-item>
       <el-breadcrumb-item>Ticket List</el-breadcrumb-item>
     </el-breadcrumb>
     <el-form :inline="true" style="display:flex;">
@@ -34,20 +34,17 @@
       </el-form-item>
     </el-form>
     <el-table
-      ref="filterTable"
       :data="ticketList"
       style="width: 100%">
       <el-table-column
         prop="ticket_no"
         :label="columns[0]"
-        sortable
         width="120">
       </el-table-column>
       <el-table-column
         prop="customer"
         :label="columns[1]"
-        width="120"
-        sortable>
+        width="120">
         <!-- <template slot-scope="scope">
           <span>{{getCustomerbyID(scope.row.customer)}}</span>
         </template> -->
@@ -59,8 +56,7 @@
       <el-table-column
         prop="status"
         :label="columns[4]"
-        width="100"
-        sortable>
+        width="100">
         <!-- <template slot-scope="scope">
           <span>{{getStatusbyID(scope.row.status)}}</span>
         </template> -->
@@ -68,8 +64,7 @@
       <el-table-column
         prop="assignee"
         :label="columns[2]"
-        width="130"
-        sortable>
+        width="130">
         <!-- <template slot-scope="scope">
           <span>{{getUserbyID(scope.row.assigned_user)}}</span>
         </template> -->
@@ -77,12 +72,11 @@
       <el-table-column
         prop="gn_no"
         :label="columns[5]"
-        width="100"
-        sortable>
+        width="120">
       </el-table-column>
       <el-table-column
         label="Documents"
-        width="200">
+        width="220">
         <template slot-scope="scope">
           <a :href="getDocPath(scope.row)"
             class="buttonText" download>{{getDocName(scope.row)[0]}}</a><br>
@@ -112,7 +106,7 @@
       :total="totalCount"
       @current-change="loadTicket">
     </el-pagination>
-  </el-main>
+  </div>
 </template>
 
 <script>
@@ -175,8 +169,12 @@ export default {
         .then(response => {
           this.generating = []
           console.log(response.data)
-          this.$store.dispatch('loadDocs')
-          this.$message.success('Documents created !')
+          if (response.data === 'NO_BREAKDOWN_FOUND') {
+            this.$message.error('No breakdown found !')
+          } else {
+            this.$store.dispatch('loadDocs')
+            this.$message.success('Documents created !')
+          }
         })
         .catch(error => {
           this.generating = []
@@ -289,18 +287,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.el-main {
-  background-color: #EEF1F4;
-}
-.button-bar {
-  float: right;
-  padding-top: 2vh;
-  padding-bottom: 1vh;
-}
-.el-pagination {
-  margin-top: 2vh;
-}
-.el-breadcrumb {
-  margin-bottom: 2vh;
-}
 </style>

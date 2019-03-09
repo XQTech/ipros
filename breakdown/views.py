@@ -1,10 +1,9 @@
-from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, Customer, BreakdownCategory
+from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, BreakdownCategory
 from breakdown import serializers as bds
 from breakdown.permissions import IsOwnerOrReadOnly
 from rest_framework import permissions, viewsets, status
 from django.http import Http404
-from django.db.models import Q
-from rest_framework.decorators import action, api_view, action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -108,10 +107,6 @@ class FuncGroupsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FunctionGroup.objects.all()
     serializer_class = bds.FunctionGroupSerializer
 
-class CustomersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = bds.CustomerSerializer
-
 class UsersViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = bds.UserSerializer
@@ -205,6 +200,9 @@ class GenerateDocView(APIView):
     def get(self, request, pk, format=None):    
         ticket = self.get_ticket(pk)
         breakdowns = self.get_breakdown(pk)
+        if breakdowns == None or len(breakdowns) == 0:
+            return Response("NO_BREAKDOWN_FOUND")
+
         docPath = DOC_PATH + ticket.ticket_no + '/'
         docName = docPath + 'FD-' + ticket.ticket_no + '.docx'
         xlsName = docPath + 'Breakdown-' + ticket.ticket_no + '.xlsx'

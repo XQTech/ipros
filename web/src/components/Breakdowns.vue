@@ -1,9 +1,9 @@
 <template>
-  <el-main>
+  <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }" @click.native="goHome">Home</el-breadcrumb-item>
-      <el-breadcrumb-item>Ticket ({{ selectedTicket.ticket_no }})</el-breadcrumb-item>
       <el-breadcrumb-item>Breakdown</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/breakdown' }" @click.native="goHome">Ticket List</el-breadcrumb-item>
+      <el-breadcrumb-item>{{ selectedTicket.ticket_no }}</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="button-bar">
       <el-button
@@ -12,7 +12,6 @@
         @click="handleCreate()"></el-button>
     </div>
     <el-table
-      ref="filterTable"
       :data="breakdowns"
       style="width: 100%">
       <el-table-column
@@ -100,7 +99,7 @@
     <UploadImage
       ref="imageForm"
       v-on:loadBreakdowns="loadBreakdowns"></UploadImage>
-  </el-main>
+  </div>
 </template>
 
 <script>
@@ -246,7 +245,4 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.el-main {
-  background-color: #EEF1F4;
-}
 </style>

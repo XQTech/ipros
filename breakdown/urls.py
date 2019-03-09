@@ -28,7 +28,6 @@ router.register(r'tickets', views.TicketViewSet)
 router.register(r'breakdowns', views.BreakdownViewSet)
 router.register(r'status', views.StatusViewSet)
 router.register(r'funcgroups', views.FuncGroupsViewSet)
-router.register(r'customers', views.CustomersViewSet)
 router.register(r'users', views.UsersViewSet)
 router.register(r'categories', views.CategoryViewSet)
 

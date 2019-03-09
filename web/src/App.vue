@@ -1,12 +1,24 @@
 <template>
-  <div id="app">
+  <el-container v-if="$route.meta.keepAlive" id='App'>
+    <el-header>
+      <Header></Header>
+    </el-header>
+    <el-main>
+      <router-view></router-view>
+    </el-main>
+  </el-container>
+  <div v-else id='App'>
     <router-view/>
   </div>
 </template>
 
 <script>
+import Header from '@/components/Header'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    Header
+  }
 }
 </script>
 
@@ -22,5 +34,11 @@ export default {
   bottom: 0;
   right: 0;
   left: 0;
+}
+.el-main {
+  background-color: #EEF1F4;
+}
+body {
+  margin: 0px;
 }
 </style>

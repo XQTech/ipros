@@ -1,23 +1,6 @@
 <template>
-  <el-container>
-    <el-container>
-      <el-header>
-        <el-menu :default-active="activeIndex" mode="horizontal">
-          <div class="logo-container">
-            <img :src="logoUrl"/>
-          </div>
-          <el-menu-item index="1" @click="loadTickets">Ticket/Breakdown</el-menu-item>
-          <el-menu-item index="2">Support Log</el-menu-item>
-          <el-menu-item index="4" @click="handleLogout" style="float:right;">Log Out</el-menu-item>
-          <el-menu-item index="3" style="float:right;">
-            <a href="http://localhost:8000/admin" target="_blank" style="text-decoration: none;">Admin</a>
-          </el-menu-item>
-        </el-menu>
-      </el-header>
-      <Breakdowns v-if="showBreakdown" :selectedTicket="selectedTicket"></Breakdowns>
-      <Tickets v-else></Tickets>
-    </el-container>
-  </el-container>
+  <Breakdowns v-if="showBreakdown" :selectedTicket="selectedTicket"></Breakdowns>
+  <Tickets v-else></Tickets>
 </template>
 
 <script>
@@ -44,8 +27,8 @@ export default {
     }
     this.$store.dispatch('loadFuncGroup')
     this.$store.dispatch('loadStatus')
-    this.$store.dispatch('loadCustomers')
     this.$store.dispatch('loadToken')
+    this.$store.dispatch('loadUsers')
   },
   computed: {
     ...mapState({
@@ -54,9 +37,6 @@ export default {
     })
   },
   methods: {
-    handleSelect () {
-      console.log('handle select')
-    },
     isLoggedIn () {
       return isLoggedIn()
     },
@@ -70,7 +50,7 @@ export default {
     loadTickets () {
       let params = {
         keys: null,
-        page: this.page
+        page: 1
       }
       this.$store.dispatch('loadDocs')
       this.$store.dispatch('loadTickets', params)

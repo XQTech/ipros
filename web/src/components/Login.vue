@@ -71,7 +71,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .login-wrap {
   position: relative;
@@ -82,7 +81,7 @@ export default {
   position: absolute;
   top: 50%;
   width: 100%;
-  margin-top: -230px;
+  margin-top: 150px;
   text-align: center;
   font-size: 30px;
 }
@@ -92,7 +91,7 @@ export default {
   top: 50%;
   width: 300px;
   height: 160px;
-  margin: -200px 0 0 -190px;
+  margin: 200px 0 0 -190px;
   padding: 40px;
   border-radius: 5px;
 }

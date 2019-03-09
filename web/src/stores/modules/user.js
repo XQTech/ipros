@@ -11,7 +11,7 @@ export default {
     }
   },
   actions: {
-    loadFuncGroup ({commit}) {
+    loadUsers ({commit}) {
       console.log('>>>loading users....')
       axios.get('http://localhost:8000/api/users/')
         .then(response => {

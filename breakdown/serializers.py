@@ -1,18 +1,12 @@
 from rest_framework import serializers
-from breakdown.models import Ticket, Breakdown, Customer, Status, FunctionGroup, BreakdownCategory
+from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, BreakdownCategory
 from django.contrib.auth.models import User
-from rest_framework.decorators import detail_route
 
 
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
         fields = ('id', 'code')
-
-class CustomerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = ('id', 'name')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

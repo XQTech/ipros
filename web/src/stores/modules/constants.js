@@ -1,5 +1,4 @@
 export default {
-
   state: {
     csrToken: ''
   },
@@ -18,5 +17,8 @@ export default {
         commit('SET_TOKEN', parts.pop().split(';').shift())
       }
     }
+  },
+  getters: {
+    csrTokenGetter: state => state.csrToken
   }
 }

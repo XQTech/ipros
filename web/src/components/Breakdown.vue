@@ -84,7 +84,7 @@ export default {
   computed: {
     ...mapState({
       statusList: state => state.ticketStatus.statusList,
-      funcGroups: state => state.funcGroups.functionGroups,
+      funcGroups: state => state.funcGroup.functionGroups,
       categories: state => state.category.categories,
       users: state => state.user.users
     })

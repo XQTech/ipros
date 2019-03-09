@@ -7,13 +7,13 @@ export default {
   },
   mutations: {
     SET_CUSTOMER (state, data) {
-      state.customers = data.results
+      state.customers = data
     }
   },
   actions: {
     loadCustomers ({commit}) {
       console.log('>>>loading customers....')
-      axios.get('http://localhost:8000/api/customers/')
+      axios.get('http://localhost:8000/api/sup/customers/')
         .then(response => {
           console.log(response)
           console.log(response.data)
