@@ -19,7 +19,7 @@
       <el-menu-item index="3" @click="loadEnvs">
         <template>
           <i class="fa fa-server"></i>
-          <span>Envirement</span>
+          <span>Environment</span>
         </template>
       </el-menu-item>
       <el-menu-item index="5" @click="handleLogout" style="float:right;">Log Out</el-menu-item>
@@ -84,7 +84,10 @@ export default {
       this.$router.push({ name: 'SupLog' })
     },
     loadEnvs () {
-      this.$message.info('Not implemented, Coming soon !')
+      this.$store.dispatch('loadCustomers', this.params)
+      this.$store.dispatch('loadEnvItems', this.params)
+      this.$store.dispatch('loadEnvTypes', this.params)
+      this.$router.push({ name: 'Envs' })
     }
   }
 }

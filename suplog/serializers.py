@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from suplog.models import Suplog, SystemModule, Customer, CustomerStaff, Status, Type
+from suplog.models import Suplog, CustomerStaff, Status, Type
 
 class SuplogSerializer(serializers.ModelSerializer):
 
@@ -11,18 +11,6 @@ class SuplogSerializer(serializers.ModelSerializer):
         fields = ('id', 'status', 'customer', 'assignee', 'reporter',
                   'description', 'solution', 'issueType', 'sup_st_time',
                   'sup_ed_time', 'system', 'hours')
-
-class SystemModuleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SystemModule
-        fields = '__all__'
-
-
-class CustomerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = '__all__'
-
 
 class CustomerStaffSerializer(serializers.ModelSerializer):
     class Meta:

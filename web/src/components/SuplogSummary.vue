@@ -87,7 +87,6 @@ export default {
       this.dialogFormVisible = true
     },
     refreshSummary () {
-      console.log('>>>loading all sup logs....')
       let url = '/api/sup/suplogs-all/?start-time=' + this.startDate + '&end-time=' + this.endDate
       this.$http.get(url)
         .then(response => {
@@ -102,7 +101,7 @@ export default {
           this.generateSummary('byreporter', this.getPieChartData('reporter', this.getReporterbyID()), 'Reporter')
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     },
     getPieChartData (field, f) {

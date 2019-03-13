@@ -26,7 +26,6 @@ export default {
   },
   actions: {
     loadSupLogs ({commit}, params) {
-      console.log('>>>loading sup logs....')
       let url = '/api/sup/suplogs/?page=' + params.page
       if (params.keys) {
         for (var key in params.keys) {
@@ -35,8 +34,6 @@ export default {
       }
       params.self.$http.get(url)
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_SUPLOG', response.data)
         })
         .catch(error => {
@@ -45,10 +42,8 @@ export default {
     },
     createSuplog ({commit}, params) {
       return new Promise((resolve, reject) => {
-        console.log('>>>create sup log....')
         params.self.$http.post('/api/sup/suplogs/', params.item)
           .then(response => {
-            console.log(response)
             commit('ADD_SUPLOG', response.data)
             resolve(response)
           })
@@ -59,14 +54,13 @@ export default {
     },
     deleteSupLog ({commit}, params) {
       return new Promise((resolve, reject) => {
-        console.log('>>>delete suplog....' + params.id)
         params.self.$http.delete('/api/sup/suplogs/' + params.id + '/')
           .then(response => {
             commit('DEL_SUPLOG', params.id)
             resolve(response)
           })
           .catch(error => {
-            console.log(error.message)
+            console.log(error)
             reject(error)
           })
       })

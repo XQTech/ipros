@@ -59,13 +59,11 @@ export default {
     }
   },
   created () {
-    console.log('Login created')
     if (isLoggedIn()) {
       this.$router.push({ name: 'Home' })
     }
   },
   mounted () {
-    console.log('Login mounted')
     this.backgroud = Math.round(Math.random() * 8)
   },
   beforeUpdate () {},

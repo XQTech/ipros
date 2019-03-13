@@ -1,20 +1,10 @@
 from django.db import models
 from django.conf import settings
+from common.models import Customer
+from common.models import SystemModule
 import datetime
 
 # Create your models here.
-
-class SystemModule(models.Model):
-    name = models.CharField(max_length=15)
-
-    def __str__(self):
-        return self.name
-
-class Customer(models.Model):
-    name = models.CharField(max_length=15)
-
-    def __str__(self):
-        return self.name
 
 class CustomerStaff(models.Model):
     name = models.CharField(max_length=15)

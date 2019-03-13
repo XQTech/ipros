@@ -5,12 +5,10 @@ export default {
   mutations: {
     SET_TOKEN (state, data) {
       state.csrToken = data
-      console.log(data)
     }
   },
   actions: {
     loadToken ({commit}) {
-      console.log('load token..............')
       var value = '; ' + document.cookie
       var parts = value.split('; csrftoken=')
       if (parts.length === 2) {

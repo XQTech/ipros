@@ -10,11 +10,8 @@ export default {
   },
   actions: {
     loadUsers ({commit}, params) {
-      console.log('>>>loading users....')
       params.self.$http.get('/api/users/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_USERS', response.data)
         })
         .catch(error => {

@@ -10,11 +10,8 @@ export default {
   },
   actions: {
     loadReporter ({commit}, params) {
-      console.log('>>>loading reporter....')
       params.self.$http.get('/api/sup/reporters/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_REPORTER', response.data)
         })
         .catch(error => {

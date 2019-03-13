@@ -62,10 +62,9 @@ export default {
     handleRemove (file, fileList) {
       this.$http.delete(this.actionUrl, {params: {name: file.name}})
         .then(response => {
-          console.log(response.data)
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     },
     handleExceed () {
@@ -83,10 +82,9 @@ export default {
       param.append('file', file.file)
       this.$http.putfile(this.actionUrl, param)
         .then(response => {
-          console.log(response.data)
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     }
   }

@@ -10,11 +10,8 @@ export default {
   },
   actions: {
     loadCustomers ({commit}, params) {
-      console.log('>>>loading customers....')
-      params.self.$http.get('/api/sup/customers/')
+      params.self.$http.get('/api/common/customers/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_CUSTOMER', response.data)
         })
         .catch(error => {

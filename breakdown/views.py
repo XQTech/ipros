@@ -66,8 +66,7 @@ class UploadImageView(APIView):
             raise Http404
 
     def put(self, request, pk, format=None):    
-        bk = self.get_object(pk)
-        print(self.request.FILES.get('file'))     
+        bk = self.get_object(pk)    
         if (bk.image1 == '' or bk.image1 == None):          
             bk.image1 = self.request.FILES.get('file')
         elif (bk.image2 == '' or bk.image2 == None):
@@ -204,7 +203,6 @@ class DocumentListView(APIView):
         """
         data = []
         ticketFolders = os.listdir(DOC_PATH)
-        print(ticketFolders)
         for folder in ticketFolders:
             fdPath = DOC_PATH + folder + '/'
             docName = 'FD-' + folder + '.docx'

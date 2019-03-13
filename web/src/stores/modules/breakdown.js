@@ -18,6 +18,9 @@ export default {
     },
     ADD_BREAKDOWN (state, breakdown) {
       state.breakdowns.unshift(breakdown)
+      state.breakdowns.sort(function (a, b) {
+        return a.sequence - b.sequence
+      })
     }
   },
   actions: {
@@ -27,7 +30,7 @@ export default {
           commit('SET_BREAKDOWNS', response.data)
         })
         .catch(error => {
-          console.log(error)
+          this.$message.error(error.message)
         })
     },
     deleteBreakdown ({commit}, params) {

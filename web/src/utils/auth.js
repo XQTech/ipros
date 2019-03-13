@@ -16,7 +16,6 @@ export function login (username, password) {
   const url = `${BACKEND_URL}/api-token-auth/`
   axios.post(url, { username: username, password: password })
     .then(function (response) {
-      console.log('response.data.token: ', response.data.token)
       localStorage.setItem(ACCESS_TOKEN_KEY, response.data.token)
       localStorage.setItem(USER_NAME, username)
       // router.go(REDIRECT_URL_AFTER_LOGIN)

@@ -10,11 +10,8 @@ export default {
   },
   actions: {
     loadSupTypes ({commit}, params) {
-      console.log('>>>loading sup types....')
       params.self.$http.get('/api/sup/types/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_TYPE', response.data)
         })
         .catch(error => {

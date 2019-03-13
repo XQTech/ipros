@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SystemModule, Suplog, Customer, CustomerStaff, Status, Type
+from .models import Suplog, CustomerStaff, Status, Type
 
 # Register your models here.
 
@@ -9,8 +9,6 @@ from .models import SystemModule, Suplog, Customer, CustomerStaff, Status, Type
 class CustomerStaffAdmin(admin.ModelAdmin):
     list_display = ('company', 'name')
 
-admin.site.register(SystemModule)
-admin.site.register(Customer)
 admin.site.register(CustomerStaff, CustomerStaffAdmin)
 admin.site.register(Status)
 admin.site.register(Type)

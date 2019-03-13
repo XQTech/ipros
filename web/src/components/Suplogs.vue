@@ -211,12 +211,12 @@ export default {
       this.$router.push({ name: 'Login' })
     }
     this.$store.dispatch('loadToken')
-    this.$store.dispatch('loadReporter', this.params)
-    this.$store.dispatch('loadSupStatus', this.params)
-    this.$store.dispatch('loadCustomers', this.params)
-    this.$store.dispatch('loadSupTypes', this.params)
-    this.$store.dispatch('loadModules', this.params)
-    this.$store.dispatch('loadUsers', this.params)
+    // this.$store.dispatch('loadReporter', this.params)
+    // this.$store.dispatch('loadSupStatus', this.params)
+    // this.$store.dispatch('loadCustomers', this.params)
+    // this.$store.dispatch('loadSupTypes', this.params)
+    // this.$store.dispatch('loadModules', this.params)
+    // this.$store.dispatch('loadUsers', this.params)
   },
   computed: {
     ...mapState({

@@ -11,7 +11,6 @@ export default {
     SET_TICKETS (state, data) {
       state.ticketList = data.results
       state.totalCount = data.count
-      console.log('total Tickets: ' + state.totalCount)
       state.showBreakdown = false
       state.selectedTicket = null
     },
@@ -25,18 +24,14 @@ export default {
   },
   actions: {
     loadTickets ({commit}, params) {
-      console.log('>>>loading ticket....')
       let url = '/api/tickets/?page=' + params.page
       if (params.keys) {
         for (var key in params.keys) {
           url += '&' + key + '=' + params.keys[key]
         }
       }
-      console.log(url)
       params.self.$http.get(url)
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_TICKETS', response.data)
         })
         .catch(error => {
@@ -44,12 +39,8 @@ export default {
         })
     },
     loadDocs ({commit}, params) {
-      console.log('>>>loading docs....')
       params.self.$http.get('/api/docs/')
         .then(response => {
-          console.log('docs list.............')
-          console.log(response)
-          console.log(response.data)
           commit('SET_DOCS', response.data)
         })
         .catch(error => {

@@ -116,7 +116,6 @@ export default {
       this.isAdd = false
       this.dialogFormVisible = true
       this.suplog = suplog
-      console.log(suplog)
     },
     customerChange () {
       let suplog = this.suplog

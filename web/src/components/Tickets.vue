@@ -197,7 +197,6 @@ export default {
       this.$http.get('/api/breakdowns/doc/' + ticket.id + '/')
         .then(response => {
           Vue.set(this.generating, index, false)
-          console.log(response.data)
           if (response.data === 'NO_BREAKDOWN_FOUND') {
             this.$message.error('No breakdown found !')
           } else {
@@ -248,19 +247,19 @@ export default {
                   let ticket = this.getUpdatedTicket(issue, resp)
                   this.$http.put('/api/tickets/' + ticket.id + '/', ticket)
                     .catch(error => {
-                      console.log(error)
+                      this.$message.error(error.message)
                     })
                   this.oldCount++
                 } else {
                   this.$http.post('/api/tickets/', this.getNewTicket(issue))
                     .catch(error => {
-                      console.log(error)
+                      this.$message.error(error.message)
                     })
                   this.newCount++
                 }
               })
               .catch(error => {
-                console.log(error)
+                this.$message.error(error.message)
               })
           })
           setTimeout(() => {

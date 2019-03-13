@@ -23,12 +23,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '(06+(o257ai7n+g-xn4&@xd6l&yta)9lx502f7ok7iq8k)zzql'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '*',
 ]
 
+# For Deployment
+ADMINS = (
+    ('Li Qiang', 'li.qiang@gips-dl.com'),
+)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+X_FRAME_OPTIONS = 'DENY'
 
 # Application definition
 
@@ -36,6 +45,8 @@ INSTALLED_APPS = [
     # 'user.apps.UserConfig',
     'breakdown.apps.BreakdownConfig',
     'suplog.apps.SuplogConfig',
+    'common.apps.CommonConfig',
+    'envs.apps.EnvsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

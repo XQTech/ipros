@@ -201,10 +201,8 @@ export default {
     },
     handleUpdate (breakdown) {
       this.$refs.breakdownForm.updateBreakdown(breakdown)
-      console.log(breakdown.description)
     },
     handleCreate () {
-      console.log('creating breakdown.....open form....')
       this.$refs.breakdownForm.addBreakdown(this.selectedTicket)
     },
     handleUpdateImage (breakdown) {

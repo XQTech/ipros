@@ -9,9 +9,7 @@ app_name = 'suplog'
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'suplogs', views.SuplogViewSet)
-router.register(r'systems', views.SystemModuleViewSet)
 router.register(r'statuss', views.StatusViewSet)
-router.register(r'customers', views.CustomerViewSet)
 router.register(r'reporters', views.CustomerStaffViewSet)
 router.register(r'types', views.TypeViewSet)
 

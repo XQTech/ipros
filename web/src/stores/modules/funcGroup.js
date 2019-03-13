@@ -10,12 +10,8 @@ export default {
   },
   actions: {
     loadFuncGroup ({commit}, params) {
-      console.log('>>>loading function group....')
-      console.log(self.$http)
       params.self.$http.get('/api/funcgroups/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_FUNC_GROUP', response.data)
         })
         .catch(error => {

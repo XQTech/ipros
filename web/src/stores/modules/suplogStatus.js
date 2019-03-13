@@ -11,11 +11,8 @@ export default {
   },
   actions: {
     loadSupStatus ({commit}, params) {
-      console.log('>>>loading status....')
       params.self.$http.get('/api/sup/statuss/')
         .then(response => {
-          console.log(response)
-          console.log(response.data)
           commit('SET_SUP_STATUS', response.data)
         })
         .catch(error => {
