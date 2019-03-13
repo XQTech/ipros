@@ -1,5 +1,5 @@
 <template>
-    <div class="login-wrap">
+    <div class="login-wrap" :style="{'background-image': 'url(' + require('../../static/img/'+backgroud+'.jpeg') + ')'}">
         <div class="ms-title">Log In</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px">
@@ -19,13 +19,14 @@
 </template>
 
 <script>
-import { login, isLoggedIn } from '../../utils/auth'
+import { login, isLoggedIn } from '../utils/auth'
 
 export default {
   name: 'Login',
   components: {},
   data: function () {
     return {
+      backgroud: 4,
       ruleForm: {
         username: '',
         password: ''
@@ -54,17 +55,18 @@ export default {
       // TODO: read https://stackoverflow.com/questions/35664550/vue-js-redirection-to-another-page
     },
     isLoggedIn () {
-      console.log('isLoggedIn: ', isLoggedIn())
       return isLoggedIn()
     }
   },
   created () {
+    console.log('Login created')
     if (isLoggedIn()) {
       this.$router.push({ name: 'Home' })
     }
   },
   mounted () {
-    console.log('mounted')
+    console.log('Login mounted')
+    this.backgroud = Math.round(Math.random() * 8)
   },
   beforeUpdate () {},
   updated () {}
@@ -73,22 +75,24 @@ export default {
 
 <style scoped>
 .login-wrap {
-  position: relative;
+  position: absolute;
   width: 100%;
   height: 100%;
+  background-repeat: 'no-repeat';
+  background-size:100% 100%;
 }
 .ms-title {
   position: absolute;
-  top: 50%;
   width: 100%;
   margin-top: 150px;
   text-align: center;
   font-size: 30px;
+  color: white;
+  text-shadow: 0.1em 0.1em 0.05em #333;
 }
 .ms-login {
   position: absolute;
   left: 50%;
-  top: 50%;
   width: 300px;
   height: 160px;
   margin: 200px 0 0 -190px;

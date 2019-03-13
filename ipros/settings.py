@@ -26,15 +26,14 @@ SECRET_KEY = '(06+(o257ai7n+g-xn4&@xd6l&yta)9lx502f7ok7iq8k)zzql'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1'
+    '*',
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'user.apps.UserConfig',
+    # 'user.apps.UserConfig',
     'breakdown.apps.BreakdownConfig',
     'suplog.apps.SuplogConfig',
     'django.contrib.admin',
@@ -74,6 +73,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR,'web/dist'),
+            os.path.join(BASE_DIR,'ipros/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {

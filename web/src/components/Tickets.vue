@@ -2,7 +2,7 @@
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>Breakdown</el-breadcrumb-item>
-      <el-breadcrumb-item>Ticket List</el-breadcrumb-item>
+      <el-breadcrumb-item>Ticket List (Total - {{totalCount}})</el-breadcrumb-item>
     </el-breadcrumb>
     <el-form :inline="true" style="display:flex;">
       <el-form-item>
@@ -24,13 +24,14 @@
         <el-input placeholder="GN" v-model="searchKeys.gn_no__icontains"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="loadTicket(1)">Search</el-button>
+        <el-button type="primary" @click="loadTicket(1)" icon="fa fa-search"></el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleReset()">Reset</el-button>
+        <el-button type="primary" @click="handleReset()" icon="fa fa-undo"></el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleSyncTicket()" :loading="progressVisible">Sync JIRA</el-button>
+        <el-button type="primary" @click="handleSyncTicket()" :loading="progressVisible"
+         icon="fa fa-refresh"> JIRA</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -84,19 +85,27 @@
             class="buttonText" download>{{getDocName(scope.row)[1]}}</a>
         </template>
       </el-table-column>
-      <el-table-column label="Action" width="150">
+      <el-table-column label="Action" width="200">
         <template slot-scope="scope">
-          <el-button
+          <el-badge :value="scope.row.bkcount" class="item" type="info">
+            <el-button
             size="mini"
             type="primary"
             icon="el-icon-more"
             @click="handleBreakdown(scope.row)"></el-button>
+          </el-badge>
           <el-button
           size="mini"
           type="primary"
-          icon="el-icon-document"
+          icon="fa fa-file-word-o"
           @click="handleGenerateDoc(scope.row, scope.$index)"
           :loading="generating[scope.$index]"></el-button>
+          <el-button
+          size="mini"
+          type="primary"
+          icon="fa fa-upload"
+          @click="handleUploadDoc(scope.row, scope.$index)"
+          :loading="uploading[scope.$index]"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -111,10 +120,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { getAccessToken } from '../../utils/auth'
-import { api } from '../../utils/api'
-import axios from 'axios'
-
+import Vue from 'vue'
 export default {
   name: 'Tickets',
   mounted: function () {
@@ -128,20 +134,29 @@ export default {
         assignee__icontains: '',
         summary__icontains: '',
         status__icontains: '',
-        gn_no__icontains: ''
+        gn_no__icontains: '',
+        jira_id__iexact: ''
       },
       columns: [
         'Ticket No',
         'Customer',
         'Assigned To',
-        'description',
+        'Description',
         'Status',
         'GN'
       ],
       progressVisible: false,
       oldCount: 0,
       newCount: 0,
-      generating: []
+      generating: [],
+      uploading: [],
+      params: {
+        self: this,
+        keys: [],
+        page: 1,
+        item: null,
+        id: 0
+      }
     }
   },
   computed: {
@@ -156,28 +171,42 @@ export default {
   },
   methods: {
     loadTicket (page) {
-      let params = {
-        keys: this.searchKeys,
-        page: page
-      }
-      this.$store.dispatch('loadDocs')
-      this.$store.dispatch('loadTickets', params)
+      this.params.page = page
+      this.params.keys = this.searchKeys
+      this.$store.dispatch('loadDocs', this.params)
+      this.$store.dispatch('loadTickets', this.params)
+    },
+    handleUploadDoc (ticket, index) {
+      Vue.set(this.uploading, index, true)
+      this.$http.get('/api/jira/upload/' + ticket.id + '/')
+        .then(response => {
+          Vue.set(this.uploading, index, false)
+          if (response.data === 'failed') {
+            this.$message.error('Failed to Upload !')
+          } else {
+            this.$message.success('Documents uploaded to JIRA !')
+          }
+        })
+        .catch(error => {
+          Vue.set(this.uploading, index, false)
+          this.$message.error(error.message)
+        })
     },
     handleGenerateDoc (ticket, index) {
-      this.generating[index] = true
-      axios.get('http://localhost:8000/api/breakdowns/doc/' + ticket.id + '/')
+      Vue.set(this.generating, index, true)
+      this.$http.get('/api/breakdowns/doc/' + ticket.id + '/')
         .then(response => {
-          this.generating = []
+          Vue.set(this.generating, index, false)
           console.log(response.data)
           if (response.data === 'NO_BREAKDOWN_FOUND') {
             this.$message.error('No breakdown found !')
           } else {
-            this.$store.dispatch('loadDocs')
+            this.$store.dispatch('loadDocs', this.params)
             this.$message.success('Documents created !')
           }
         })
         .catch(error => {
-          this.generating = []
+          Vue.set(this.generating, index, false)
           this.$message.error(error.message)
         })
     },
@@ -198,61 +227,67 @@ export default {
       return './static/media/breakdown/' + ticket.ticket_no + '/Breakdown-' + ticket.ticket_no + '.xlsx'
     },
     handleBreakdown (ticket) {
-      this.$store.dispatch('showBreakdown', ticket)
+      this.params.item = ticket
+      this.$store.dispatch('showBreakdown', this.params)
     },
     handleReset () {
       for (var key in this.searchKeys) {
         this.searchKeys[key] = ''
       }
     },
-    async handleSyncTicket () {
+    handleSyncTicket () {
       this.progressVisible = true
       this.oldCount = 0
       this.newCount = 0
-      let url = 'http://localhost:8000/api/jira/'
-      let res = await api.get(url)
-      console.log(res)
-      let ticketUrl = 'http://localhost:8000/api/tickets/'
-      let header = { 'X-Authorization': 'JWT ' + getAccessToken(),
-        'X-CSRFToken': this.$store.state.constants.csrToken
+      this.$http.get('/api/jira/')
+        .then(response => {
+          response.data.issues.forEach(issue => {
+            this.retreiveTicket(issue)
+              .then(resp => {
+                if (resp) {
+                  let ticket = this.getUpdatedTicket(issue, resp)
+                  this.$http.put('/api/tickets/' + ticket.id + '/', ticket)
+                    .catch(error => {
+                      console.log(error)
+                    })
+                  this.oldCount++
+                } else {
+                  this.$http.post('/api/tickets/', this.getNewTicket(issue))
+                    .catch(error => {
+                      console.log(error)
+                    })
+                  this.newCount++
+                }
+              })
+              .catch(error => {
+                console.log(error)
+              })
+          })
+          setTimeout(() => {
+            this.handleReset()
+            this.loadTicket(1)
+            this.progressVisible = false
+            this.$message.success('Updated ' + this.oldCount + ' Tickets, Created ' + this.newCount + ' Tickets')
+          }, 5000)
+        })
+    },
+    retreiveTicket (jiraIssue) {
+      let url = '/api/tickets/?page=1'
+      this.handleReset()
+      this.searchKeys.jira_id__iexact = jiraIssue.id
+      for (var key in this.searchKeys) {
+        url += '&' + key + '=' + this.searchKeys[key]
       }
-      res.issues.forEach(issue => {
-        this.retreiveTicket(issue)
+      return new Promise((resolve, reject) => {
+        this.$http.get(url)
           .then(response => {
-            if (response) {
-              let ticket = this.getUpdatedTicket(issue, response)
-              let putUrl = ticketUrl + ticket.id + '/'
-              api.put(putUrl, ticket, header)
-                .catch(error => {
-                  console.log(error)
-                })
-              this.oldCount++
+            if (response.data.count > 0) {
+              resolve(response.data.results[0])
             } else {
-              api.post(ticketUrl, this.getNewTicket(issue), header)
-                .catch(error => {
-                  console.log(error)
-                })
-              this.newCount++
+              resolve(null)
             }
           })
-          .catch(error => {
-            console.log(error)
-          })
       })
-      setTimeout(() => {
-        this.loadTicket(1)
-        this.progressVisible = false
-        this.$message.success('Updated ' + this.oldCount + ' Tickets, Created ' + this.newCount + ' Tickets')
-      }, 5000)
-    },
-    async retreiveTicket (jiraIssue) {
-      let url = 'http://localhost:8000/api/tickets/?ticket_no__icontains=' + jiraIssue.key
-      let res = await api.get(url)
-      if (res.count > 0) {
-        return res.results[0]
-      } else {
-        return null
-      }
     },
     getUpdatedTicket (jiraIssue, ticket) {
       return this.setTicket(jiraIssue, ticket)
@@ -272,7 +307,7 @@ export default {
     },
     setTicket (jiraIssue, ticket) {
       ticket.status = jiraIssue.fields.status.name
-      ticket.customer = jiraIssue.fields.fixVersions.name
+      ticket.customer = jiraIssue.fields.fixVersions[0].name
       ticket.assignee = jiraIssue.fields.assignee.name
       ticket.ticket_no = jiraIssue.key
       ticket.summary = jiraIssue.fields.summary
@@ -287,4 +322,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.item {
+  margin-top: 10px;
+  margin-right: 15px;
+  margin-bottom: 7px;
+}
 </style>

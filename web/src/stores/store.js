@@ -5,15 +5,6 @@ import axios from 'axios'
 import getters from './getters'
 import actions from './actions'
 import mutations from './mutations'
-import constants from './modules/constants'
-// import ticket from './modules/ticket'
-// import ticketStatus from './modules/ticket-status'
-// import funcGroups from './modules/func-group'
-// import customer from './modules/customer'
-// import category from './modules/category'
-// import user from './modules/user'
-// import constants from './constants'
-
 import modules from './modules'
 
 Vue.prototype.$ajax = axios
@@ -23,16 +14,5 @@ export default new Vuex.Store({
   getters,
   actions,
   mutations,
-  modules,
-  constants
+  modules
 })
-
-// : {
-//   ticket,
-//   ticketStatus,
-//   funcGroups,
-//   customer,
-//   category,
-//   user,
-//   constants
-// }

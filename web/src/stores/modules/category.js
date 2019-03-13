@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -7,13 +5,13 @@ export default {
   },
   mutations: {
     SET_CATEGORY (state, data) {
-      state.categories = data.results
+      state.categories = data
     }
   },
   actions: {
-    loadCustomers ({commit}) {
+    loadCustomers ({commit}, params) {
       console.log('>>>loading category....')
-      axios.get('http://localhost:8000/api/categories/')
+      params.self.$http.get('/api/categories/')
         .then(response => {
           console.log(response)
           console.log(response.data)
@@ -29,7 +27,7 @@ export default {
       if (!id) {
         return ''
       }
-      return state.categories.find(ct => ct.id === id).code
+      return state.categories.find(ct => ct.id === id)
     }
   }
 }

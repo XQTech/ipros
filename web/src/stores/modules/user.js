@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -7,13 +5,13 @@ export default {
   },
   mutations: {
     SET_USERS (state, data) {
-      state.users = data.results
+      state.users = data
     }
   },
   actions: {
-    loadUsers ({commit}) {
+    loadUsers ({commit}, params) {
       console.log('>>>loading users....')
-      axios.get('http://localhost:8000/api/users/')
+      params.self.$http.get('/api/users/')
         .then(response => {
           console.log(response)
           console.log(response.data)

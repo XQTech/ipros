@@ -39,7 +39,7 @@
             <el-date-picker
               v-model="suplog.sup_st_time"
               type="datetime"
-              value-format="yyyy-MM-dd HH:MM"
+              value-format="yyyy-MM-dd HH:mm:ss"
               placeholder="Start Date Time">
             </el-date-picker>
           </el-form-item>
@@ -126,7 +126,7 @@ export default {
       this.suplog = {
         status: 1,
         customer: 1,
-        assignee: 1,
+        assignee: 4,
         description: '',
         reporter: 1,
         solution: '',

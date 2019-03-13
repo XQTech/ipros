@@ -38,7 +38,8 @@ class FunctionGroup(models.Model):
         return self.description
 
 class BreakdownCategory(models.Model):
-    code = models.CharField(max_length=15)
+    code = models.CharField(max_length=50)
+    parent = models.ForeignKey('self', related_name='sub_category', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.code
@@ -63,7 +64,7 @@ class Ticket(models.Model):
     jira_id = models.IntegerField(default=0)
 
     class Meta:
-        ordering = ('ticket_no', '-due_date', 'customer')
+        ordering = ('-jira_id',)
 
     def __str__(self):
         return '{} / {} / {}'.format(self.customer, self.ticket_no,
@@ -75,7 +76,7 @@ def upload_path_handler(instance, filename):
     
 class Breakdown(models.Model):
     sequence = models.IntegerField(default=0)
-    category = models.ForeignKey(BreakdownCategory, null=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey(BreakdownCategory, null=True, blank=True, on_delete=models.SET_NULL)
     ticket = models.ForeignKey(
         Ticket, on_delete=models.PROTECT, related_name='breakdowns')
     function_group = models.ForeignKey(FunctionGroup, null=True, on_delete=models.SET_NULL)

@@ -22,6 +22,8 @@ class CustomerStaff(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        ordering = ('company', 'name')
 
 class Status(models.Model):
     name = models.CharField(max_length=15)

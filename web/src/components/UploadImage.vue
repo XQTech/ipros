@@ -20,9 +20,6 @@
 </template>
 
 <script>
-import { getAccessToken } from '../../utils/auth'
-import axios from 'axios'
-
 export default {
   name: 'UploadingImage',
   data () {
@@ -35,9 +32,7 @@ export default {
   },
   computed: {
     actionUrl: function () {
-      let url = 'http://localhost:8000/api/breakdowns/image/' + this.selectedBreakdown.id + '/'
-      console.log(url)
-      return url
+      return '/api/breakdowns/image/' + this.selectedBreakdown.id + '/'
     },
     images: function () {
       let images = []
@@ -63,20 +58,11 @@ export default {
     showImageForm (selectedBreakdown) {
       this.dialogFormVisible = true
       this.selectedBreakdown = selectedBreakdown
-      console.log(this.selectedBreakdown.image1)
-      console.log(this.selectedBreakdown.image2)
-      console.log(this.selectedBreakdown.image3)
     },
     handleRemove (file, fileList) {
-      console.log('deleting image...')
-      console.log(file)
-      axios.delete(this.actionUrl, {params: {name: file.name}}, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-          'X-CSRFToken': this.$store.state.constants.csrToken
-        }})
+      this.$http.delete(this.actionUrl, {params: {name: file.name}})
         .then(response => {
           console.log(response.data)
-          // this.$emit('loadBreakdowns')
         })
         .catch(error => {
           console.log(error)
@@ -86,9 +72,7 @@ export default {
       this.$message.error('Maximum 3 files')
     },
     onBeforeUpload (file) {
-      console.log('before upload..........')
       const isIMAGE = file.type === 'image/jpeg' || file.type === 'image/gif' || file.type === 'image/png'
-      console.log('before upload..........')
       if (!isIMAGE) {
         this.$message.error('Only jpeg, gif, or png is allowed !')
       }
@@ -97,14 +81,9 @@ export default {
     uploadImage (file) {
       let param = new FormData()
       param.append('file', file.file)
-      axios.put(this.actionUrl, param, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-          'X-CSRFToken': this.$store.state.constants.csrToken,
-          'Content-Type': 'multipart/form-data'
-        }})
+      this.$http.putfile(this.actionUrl, param)
         .then(response => {
           console.log(response.data)
-          // this.$emit('loadBreakdowns')
         })
         .catch(error => {
           console.log(error)

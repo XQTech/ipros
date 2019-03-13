@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -7,13 +5,13 @@ export default {
   },
   mutations: {
     SET_STATUS (state, data) {
-      state.statusList = data.results
+      state.statusList = data
     }
   },
   actions: {
-    loadStatus ({commit}) {
+    loadStatus ({commit}, params) {
       console.log('>>>loading status....')
-      axios.get('http://localhost:8000/api/status/')
+      params.self.$http.get('/api/status/')
         .then(response => {
           console.log(response)
           console.log(response.data)

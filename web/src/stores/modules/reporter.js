@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -11,9 +9,9 @@ export default {
     }
   },
   actions: {
-    loadReporter ({commit}) {
+    loadReporter ({commit}, params) {
       console.log('>>>loading reporter....')
-      axios.get('http://localhost:8000/api/sup/reporters/')
+      params.self.$http.get('/api/sup/reporters/')
         .then(response => {
           console.log(response)
           console.log(response.data)

@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -28,13 +26,14 @@ export default {
   actions: {
     loadTickets ({commit}, params) {
       console.log('>>>loading ticket....')
-      let url = 'http://localhost:8000/api/tickets/?page=' + params.page
+      let url = '/api/tickets/?page=' + params.page
       if (params.keys) {
         for (var key in params.keys) {
           url += '&' + key + '=' + params.keys[key]
         }
       }
-      axios.get(url)
+      console.log(url)
+      params.self.$http.get(url)
         .then(response => {
           console.log(response)
           console.log(response.data)
@@ -46,7 +45,7 @@ export default {
     },
     loadDocs ({commit}, params) {
       console.log('>>>loading docs....')
-      axios.get('http://localhost:8000/api/docs/')
+      params.self.$http.get('/api/docs/')
         .then(response => {
           console.log('docs list.............')
           console.log(response)
@@ -57,8 +56,8 @@ export default {
           console.log(error)
         })
     },
-    showBreakdown ({commit}, selectedTicket) {
-      commit('SHOW_BREAKDOWN', selectedTicket)
+    showBreakdown ({commit}, params) {
+      commit('SHOW_BREAKDOWN', params.item)
     }
   }
 }

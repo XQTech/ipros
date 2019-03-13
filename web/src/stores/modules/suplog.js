@@ -1,6 +1,5 @@
-import axios from 'axios'
-import { getAccessToken } from '../../../utils/auth'
 
+import Vue from 'vue'
 export default {
 
   state: {
@@ -18,25 +17,23 @@ export default {
     },
     UPD_SUPLOG (state, suplog) {
       let index = state.suplogs.findIndex(item => item.id === suplog.id)
-      console.log('updating index : ' + index)
-      state.suplogs[index] = suplog
+      Vue.set(state.suplogs, index, suplog)
     },
     ADD_SUPLOG (state, suplog) {
       state.suplogs.unshift(suplog)
-      console.log('add log id : ' + suplog.id)      
       state.totalCount = state.totalCount + 1
     }
   },
   actions: {
     loadSupLogs ({commit}, params) {
       console.log('>>>loading sup logs....')
-      let url = 'http://localhost:8000/api/sup/suplogs/?page=' + params.page
+      let url = '/api/sup/suplogs/?page=' + params.page
       if (params.keys) {
         for (var key in params.keys) {
           url += '&' + key + '=' + params.keys[key]
         }
       }
-      axios.get(url)
+      params.self.$http.get(url)
         .then(response => {
           console.log(response)
           console.log(response.data)
@@ -46,34 +43,27 @@ export default {
           console.log(error)
         })
     },
-    createSuplog ({commit, rootState}, suplog) {
+    createSuplog ({commit}, params) {
       return new Promise((resolve, reject) => {
         console.log('>>>create sup log....')
-        axios.post('http://localhost:8000/api/sup/suplogs/', suplog, {
-          headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-            'X-CSRFToken': rootState.constants.csrToken
-          }})
+        params.self.$http.post('/api/sup/suplogs/', params.item)
           .then(response => {
             console.log(response)
             commit('ADD_SUPLOG', response.data)
-            resolve()
-            // this.loadSuplogs(1)
+            resolve(response)
           })
           .catch(error => {
             reject(error)
           })
       })
     },
-    deleteSupLog ({commit, rootState}, id) {
+    deleteSupLog ({commit}, params) {
       return new Promise((resolve, reject) => {
-        console.log('>>>delete suplog....' + id)
-        axios.delete('http://localhost:8000/api/sup/suplogs/' + id + '/', {
-          headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-            'X-CSRFToken': rootState.constants.csrToken
-          }})
+        console.log('>>>delete suplog....' + params.id)
+        params.self.$http.delete('/api/sup/suplogs/' + params.id + '/')
           .then(response => {
-            commit('DEL_SUPLOG', id)
-            resolve()
+            commit('DEL_SUPLOG', params.id)
+            resolve(response)
           })
           .catch(error => {
             console.log(error.message)
@@ -81,16 +71,12 @@ export default {
           })
       })
     },
-    updateSuplog ({commit, rootState}, suplog) {
+    updateSuplog ({commit}, params) {
       return new Promise((resolve, reject) => {
-        console.log('>>>update sup log....')
-        axios.put('http://localhost:8000/api/sup/suplogs/' + suplog.id + '/', suplog, {
-          headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-            'X-CSRFToken': rootState.constants.csrToken
-          }})
+        params.self.$http.put('/api/sup/suplogs/' + params.item.id + '/', params.item)
           .then(response => {
-            commit('UPD_SUPLOG', suplog)
-            resolve()
+            commit('UPD_SUPLOG', response.data)
+            resolve(response)
           })
           .catch(error => {
             reject(error)

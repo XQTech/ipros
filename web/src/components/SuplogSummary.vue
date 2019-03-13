@@ -1,23 +1,28 @@
 <template>
   <el-dialog large title="Support Log Summary" :visible.sync="dialogFormVisible" center width="90%">
     <el-form :label-position="labelPosition" :inline="true">
-      <el-form-item label="Start Date" :label-width="formLabelWidth">
+      <el-form-item label="From">
         <el-date-picker
           v-model="startDate"
           type="date"
           value-format="yyyy-MM-dd"
-          placeholder="Start Date">
+          placeholder="From Date">
         </el-date-picker>
       </el-form-item>
-      <el-form-item label="End Date" :label-width="formLabelWidth">
+      <el-form-item label="To">
         <el-date-picker
           v-model="endDate"
           type="date"
           value-format="yyyy-MM-dd"
-          placeholder="End Date">
+          placeholder="To Date">
         </el-date-picker>
       </el-form-item>
-      <el-button @click="refreshSummary()">Go!</el-button>
+      <el-form-item>
+        <el-button type="primary" @click="refreshSummary()">Go !</el-button>
+      </el-form-item>
+      <el-form-item>
+        <span class="summary-total">Total: {{totalCount}} logs, {{totalHours}} hours</span>
+      </el-form-item>
     </el-form>
     <el-row style="margin-top:20px;">
       <el-col :span="8">
@@ -42,7 +47,6 @@
       </el-col>
     </el-row>
     <div slot="footer" class="dialog-footer">
-      <span class="summary-total">Total: {{totalCount}}</span>
       <el-button type="primary" @click="dialogFormVisible = false">Close</el-button>
     </div>
   </el-dialog>
@@ -53,8 +57,6 @@ import { mapState } from 'vuex'
 require('echarts/lib/chart/bar')
 require('echarts/lib/component/tooltip')
 require('echarts/lib/component/title')
-import axios from 'axios'
-
 export default {
   name: 'SuplogSummary',
   data () {
@@ -65,6 +67,7 @@ export default {
       startDate: '',
       endDate: '',
       totalCount: 0,
+      totalHours: 0,
       instance: this,
       suplogs: []
     }
@@ -85,8 +88,8 @@ export default {
     },
     refreshSummary () {
       console.log('>>>loading all sup logs....')
-      let url = 'http://localhost:8000/api/sup/suplogs-all/?start-time=' + this.startDate + '&end-time=' + this.endDate
-      axios.get(url)
+      let url = '/api/sup/suplogs-all/?start-time=' + this.startDate + '&end-time=' + this.endDate
+      this.$http.get(url)
         .then(response => {
           this.suplogs = response.data
           this.totalCount = this.suplogs.length
@@ -103,17 +106,26 @@ export default {
         })
     },
     getPieChartData (field, f) {
+      this.totalHours = 0
       let result = []
       let group = this.groupBy(this.suplogs, function (item) {
         return [Reflect.get(item, field)]
       })
       group.forEach(element => {
         let data = {}
-        data.value = element.length
+        data.value = this.calculateHours(element)
+        this.totalHours = Number((this.totalHours + data.value).toFixed(2))
         data.name = f(this, Reflect.get(element[0], field))
         result.push(data)
       })
       return result
+    },
+    calculateHours (group) {
+      let hours = 0
+      group.forEach(element => {
+        hours = hours + element.hours
+      })
+      return Number(hours.toFixed(2))
     },
     getWorkingHourData () {
       let workinghour = {value: 0, name: 'Working Hour'}
@@ -126,7 +138,7 @@ export default {
         }
       })
       workinghour.value = (Number(workinghour.value.toFixed(2)))
-      nonworkinghour.value = (Number(nonworkinghour.value.toFixed(2)))    
+      nonworkinghour.value = (Number(nonworkinghour.value.toFixed(2)))
       return [workinghour, nonworkinghour]
     },
     inWorkingHour (supdate) {

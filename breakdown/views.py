@@ -22,6 +22,10 @@ from docx.shared import Inches
 from openpyxl import Workbook
 from openpyxl.styles import Fill, Border, Side, PatternFill, Alignment, Font, Color
 from openpyxl.styles.colors import WHITE
+from django.db.models import Q
+from docx.shared import RGBColor
+from docx.enum.style import WD_STYLE_TYPE
+from datetime import datetime
 
 DOC_PATH = settings.MEDIA_ROOT + 'breakdown/'
 
@@ -42,17 +46,9 @@ class TicketViewSet(viewsets.ModelViewSet):
     serializer_class = bds.TicketSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = TicketFilter
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
-    # def perform_create(self, serializer):
-    #    serializer.save()
 
 
 class BreakdownViewSet(viewsets.ModelViewSet):
-    """
-    This viewset automatically provides `list`, `create`, `retrieve`,
-    `update` and `destroy` actions.
-
-    """
     
     queryset = Breakdown.objects.all()
     serializer_class = bds.BreakdownSerializer
@@ -102,18 +98,23 @@ class UploadImageView(APIView):
 class StatusViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Status.objects.all()
     serializer_class = bds.StatusSerializer
+    pagination_class = None
 
 class FuncGroupsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = FunctionGroup.objects.all()
     serializer_class = bds.FunctionGroupSerializer
+    pagination_class = None
 
 class UsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.filter(~Q(id = 1)).order_by('username')
     serializer_class = bds.UserSerializer
+    pagination_class = None
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = BreakdownCategory.objects.all()
+    # queryset = BreakdownCategory.objects.filter(Q(parent=None))
+    queryset = BreakdownCategory.objects.filter()
     serializer_class = bds.CategorySerializer
+    pagination_class = None
 
 # For auth with JWT
 class RestrictedView(APIView):
@@ -155,6 +156,43 @@ class JiraView(APIView):
         ]
         data = myjira.search_issues(jql_str, 0, -1, True, fields, None, True)
         return Response(data)
+
+class UploadToJiraView(APIView):
+
+    queryset = None
+    serializer_class = None
+    def get_ticket(self, pk):
+        try:
+            return Ticket.objects.get(pk=pk)
+        except Ticket.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        """
+        Return a list of all issues.
+        """
+        jira_server = 'http://192.168.3.39:8080'
+        jira_username = 'liqiang'
+        jira_password = 'lq2017@gips'
+
+        myjira = JIRA(jira_server,basic_auth=(jira_username,jira_password))
+        ticket = self.get_ticket(pk)
+        docPath = DOC_PATH + ticket.ticket_no + '/'
+        docName = 'FD-' + ticket.ticket_no
+        fullDocName = docPath + docName + '.docx'
+        xlsName = 'Breakdown-' + ticket.ticket_no
+        fullXlsName = docPath + xlsName + '.xlsx'
+        now = datetime.now()
+        date_time = now.strftime("%Y%m%d%H%M%S")
+        try:
+            if os.path.exists(fullDocName):
+                myjira.add_attachment(ticket.jira_id, fullDocName, docName + '-' + date_time + '.docx')
+            if os.path.exists(fullXlsName):
+                myjira.add_attachment(ticket.jira_id, fullXlsName, xlsName + '-' + date_time + '.xlsx')
+            return Response({'success'})
+        except:
+            return Response({'failed'})
+        
 
 class DocumentListView(APIView):
     queryset = None
@@ -215,18 +253,50 @@ class GenerateDocView(APIView):
         document.add_heading('FD - ' + ticket.ticket_no, 0)
         document.add_paragraph(ticket.summary)
 
-        currentCategory = None
+        currentSubCategory = None
         currentFuncGroup = None
+        currentParentCat = None
+        styles = document.styles
+        font1 = styles['Heading 1'].font
+        font1.color.rgb = RGBColor(0xEA, 0x6F, 0x5A)
+
+        font4 = styles['Heading 4'].font
+        font4.color.rgb = RGBColor(0x00, 0x00, 0x00)
+
         for bk in breakdowns:
             category = bk.category
             funcGroup = bk.function_group
-            if currentCategory == None or currentCategory != category.code:
-                currentCategory = category.code
-                document.add_heading(category.code, level=1)
-
-            if currentFuncGroup == None or currentFuncGroup != funcGroup.description:
-                currentFuncGroup = funcGroup.description
-                document.add_heading(funcGroup.description, level=2)
+            # Add parent category
+            if currentParentCat == None:
+                if category.parent == None:
+                    currentParentCat = category.id
+                    currentSubCategory = category.id
+                    currentFuncGroup = None
+                    document.add_heading(category.code, level=1)
+                else:
+                    currentParentCat = category.parent.id
+                    document.add_heading(category.parent.code, level=1)
+                    currentFuncGroup = None
+            else:
+                if category.parent == None:
+                    currentParentCat = category.id
+                    currentSubCategory = category.id
+                    currentFuncGroup = None
+                    document.add_heading(category.code, level=1)
+                elif currentParentCat != category.parent.id:
+                    currentParentCat = category.parent.id
+                    document.add_heading(category.parent.code, level=1)
+                    currentFuncGroup = None
+            
+            # Add sub category
+            if currentSubCategory == None or currentSubCategory != category.id:
+                currentSubCategory = category.id
+                currentFuncGroup = None
+                document.add_heading(category.code, level=2)
+            # Add function group
+            if funcGroup.description != '---' and (currentFuncGroup == None or currentFuncGroup != funcGroup.id):
+                currentFuncGroup = funcGroup.id
+                document.add_heading(funcGroup.description, level=4)
 
             try:
                 startIndex = bk.description.index('{')
@@ -281,11 +351,19 @@ class GenerateDocView(APIView):
         self.createCell(ws, startRow, startCol+3, titleFont, titleFill, thin_border, 'Items')
         self.createCell(ws, startRow, startCol+4, titleFont, titleFill, thin_border, 'Effort(mds)')
 
-        currentCategory = None
+        startRow += 1
+        self.createCell(ws, startRow, startCol, detailFont, None, thin_border, 1)
+        self.createCell(ws, startRow, startCol+1, detailFont, None, thin_border, 'Requirement Clarification')
+        self.createCell(ws, startRow, startCol+2, detailFont, None, thin_border, '')
+        self.createCell(ws, startRow, startCol+3, detailFont, None, thin_border, '1. Requirement Study\n2. Requirement Clarification')
+        self.createCell(ws, startRow, startCol+4, detailFont, None, thin_border, 0)
+
+        currentSubCategory = None
         currentFuncGroup = None
         categoryStartRow = 0
         funcStartRow = 0
-        i = 0
+        i = 1
+        devEffort = 0
         row = startRow
         for bk in breakdowns:
             i = i + 1
@@ -306,38 +384,64 @@ class GenerateDocView(APIView):
                 self.createCell(ws, row, startCol+3, detailFont, None, thin_border, bk.description[startIndex:endIndex])
             else:
                 self.createCell(ws, row, startCol+3, detailFont, None, thin_border, bk.description)
+
             self.createCell(ws, row, startCol+4, detailFont, None, thin_border, bk.effort)
+            devEffort += bk.effort
             
             if currentFuncGroup == None:
                 funcStartRow = row
-                currentFuncGroup = funcGroup.description
-            elif currentFuncGroup != funcGroup.description:
+                currentFuncGroup = funcGroup.id
+            elif currentFuncGroup != funcGroup.id:
                 if funcStartRow < row - 1:
                     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
                 funcStartRow = row
-                currentFuncGroup = funcGroup.description
+                currentFuncGroup = funcGroup.id
 
-            if currentCategory == None:
+            if currentSubCategory == None:
                 categoryStartRow = row
-                currentCategory = category.code
-            elif currentCategory != category.code:
+                currentSubCategory = category.id
+            elif currentSubCategory != category.id:
                 if categoryStartRow < row - 1:
                     ws.merge_cells(start_row=categoryStartRow, start_column=startCol+1, end_row=row - 1, end_column=startCol+1)
                 categoryStartRow = row
-                currentCategory = category.code
+                currentSubCategory = category.id
                 # set index for func group
                 if funcStartRow < row - 1:
                     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
                 funcStartRow = row
-                currentFuncGroup = funcGroup.description
-            elif i == len(breakdowns) and categoryStartRow < row:
+                currentFuncGroup = funcGroup.id
+            elif i == len(breakdowns) + 1 and categoryStartRow < row:
                 ws.merge_cells(start_row=categoryStartRow, start_column=startCol+1, end_row=row, end_column=startCol+1)
                 # set index for func group
                 if funcStartRow < row:
                     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row, end_column=startCol+2)
 
-        formula = '=SUM(F' + str(startRow + 1) + ':F' + str(startRow + i) + ')'
-        self.createCell(ws, startRow + 1 + i, startCol+4, titleFont, titleFill, None, formula)
+        row += 1
+        i += 1
+        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'QA Test')
+        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, '1.Prepare test  cases. \n2. Test execution')
+        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, devEffort * 0.15)
+
+        row += 1
+        i += 1
+        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Deployment')
+        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'To both testing and live servers')
+        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 1)
+
+        row += 1
+        i += 1
+        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Support&Warranty')
+        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'Support Customer Testing and Warranty')
+        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 0)
+
+        formula = '=SUM(F' + str(startRow) + ':F' + str(row) + ')'
+        self.createCell(ws, row + 1, startCol+4, titleFont, titleFill, None, formula)
 
         if os.path.exists(docName):
             os.remove(docName)
@@ -355,6 +459,7 @@ class GenerateDocView(APIView):
         if border:
             col_sn.border = border
         col_sn.alignment = Alignment(wrap_text=True)
+
 
 
 

@@ -7,12 +7,19 @@
             <el-input-number v-model="selectedBreakdown.sequence"></el-input-number>
           </el-form-item>
           <el-form-item label="Category" :label-width="formLabelWidth">
-            <el-select v-model="selectedBreakdown.category" placeholder="------">
+            <!-- <el-select v-model="selectedBreakdown.category" placeholder="------">
               <el-option v-for="cat in categories"
                 v-bind:key="cat.id"
                 :label="cat.code"
                 :value="cat.id"></el-option>
-            </el-select>
+            </el-select> -->
+            <el-cascader
+              :options="getCategoryOptions(categories)"
+              v-model="selectedOptions"
+              @change="handleChange"
+              placeholder="---------"
+              style="width:80%;">
+            </el-cascader>
           </el-form-item>
           <el-form-item label="Function Group" :label-width="formLabelWidth">
             <el-select v-model="selectedBreakdown.function_group" placeholder="------">
@@ -67,8 +74,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import { getLoginUser } from '../../utils/auth'
-
+import { getLoginUser } from '../utils/auth'
 export default {
   name: 'Breakdown',
   data () {
@@ -78,7 +84,8 @@ export default {
       selectedBreakdown: {},
       selectedTicket: null,
       isAdd: false,
-      labelPosition: 'left'
+      labelPosition: 'left',
+      selectedOptions: []
     }
   },
   computed: {
@@ -90,11 +97,41 @@ export default {
     })
   },
   methods: {
+    handleChange () {
+      this.selectedBreakdown.category = this.selectedOptions.slice(-1)[0]
+    },
+    getCategoryOptions (elements) {
+      let options = []
+      elements.forEach(element => {
+        if (element.parent !== null && element.sub_category != null) {
+          return false
+        }
+        let option = this.convertCategory(element)
+        if (element.sub_category && element.sub_category.length > 0) {
+          option.children = this.getCategoryOptions(element.sub_category)
+        }
+        options.push(option)
+      })
+      return options
+    },
+    convertCategory (element) {
+      return {
+        value: element.id,
+        label: element.code
+      }
+    },
     updateBreakdown (selectedBreakdown) {
       this.isAdd = false
       this.dialogFormVisible = true
       this.selectedBreakdown = selectedBreakdown
-      console.log(selectedBreakdown)
+      if (this.selectedBreakdown.category != null) {
+        let parent = this.$store.getters.getCategoryById(this.selectedBreakdown.category).parent
+        if (parent != null) {
+          this.selectedOptions = [parent, this.selectedBreakdown.category]
+        } else {
+          this.selectedOptions = [this.selectedBreakdown.category]
+        }
+      }
     },
     addBreakdown (selectedTicket) {
       this.selectedBreakdown = {
@@ -105,7 +142,7 @@ export default {
         description: '',
         status: 1,
         effort: 0,
-        assigned_user: 1,
+        assigned_user: 3,
         image1: null,
         image2: null,
         image3: null,

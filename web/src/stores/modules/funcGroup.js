@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -7,13 +5,14 @@ export default {
   },
   mutations: {
     SET_FUNC_GROUP (state, data) {
-      state.functionGroups = data.results
+      state.functionGroups = data
     }
   },
   actions: {
-    loadFuncGroup ({commit}) {
+    loadFuncGroup ({commit}, params) {
       console.log('>>>loading function group....')
-      axios.get('http://localhost:8000/api/funcgroups/')
+      console.log(self.$http)
+      params.self.$http.get('/api/funcgroups/')
         .then(response => {
           console.log(response)
           console.log(response.data)

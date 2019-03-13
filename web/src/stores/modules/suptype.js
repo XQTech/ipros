@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -11,9 +9,9 @@ export default {
     }
   },
   actions: {
-    loadSupTypes ({commit}) {
+    loadSupTypes ({commit}, params) {
       console.log('>>>loading sup types....')
-      axios.get('http://localhost:8000/api/sup/types/')
+      params.self.$http.get('/api/sup/types/')
         .then(response => {
           console.log(response)
           console.log(response.data)

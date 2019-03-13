@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from suplog.models import Suplog, SystemModule, Customer, CustomerStaff, Status, Type
-from django.contrib.auth.models import User
-
 
 class SuplogSerializer(serializers.ModelSerializer):
 
@@ -13,13 +11,6 @@ class SuplogSerializer(serializers.ModelSerializer):
         fields = ('id', 'status', 'customer', 'assignee', 'reporter',
                   'description', 'solution', 'issueType', 'sup_st_time',
                   'sup_ed_time', 'system', 'hours')
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'username')
-
 
 class SystemModuleSerializer(serializers.ModelSerializer):
     class Meta:

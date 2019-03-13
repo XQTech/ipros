@@ -1,4 +1,3 @@
-import axios from 'axios'
 
 export default {
 
@@ -11,9 +10,9 @@ export default {
     }
   },
   actions: {
-    loadSupStatus ({commit}) {
+    loadSupStatus ({commit}, params) {
       console.log('>>>loading status....')
-      axios.get('http://localhost:8000/api/sup/statuss/')
+      params.self.$http.get('/api/sup/statuss/')
         .then(response => {
           console.log(response)
           console.log(response.data)

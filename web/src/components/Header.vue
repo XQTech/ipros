@@ -4,11 +4,27 @@
       <div class="logo-container">
           <img :src="logoUrl"/>
       </div>
-      <el-menu-item index="1" @click="loadTickets">Breakdown</el-menu-item>
-      <el-menu-item index="2" @click="loadSuplogs">Support Log</el-menu-item>
+      <el-menu-item index="1" @click="loadTickets">
+        <template>
+          <i class="el-icon-tickets"></i>
+          <span>Breakdown</span>
+        </template>
+      </el-menu-item>
+      <el-menu-item index="2" @click="loadSuplogs">
+        <template>
+          <i class="el-icon-phone-outline"></i>
+          <span>Support Log</span>
+        </template>
+      </el-menu-item>
+      <el-menu-item index="3" @click="loadEnvs">
+        <template>
+          <i class="fa fa-server"></i>
+          <span>Envirement</span>
+        </template>
+      </el-menu-item>
       <el-menu-item index="5" @click="handleLogout" style="float:right;">Log Out</el-menu-item>
       <el-menu-item index="4" style="float:right;">
-          <a href="http://localhost:8000/admin" target="_blank" style="text-decoration: none;">Admin</a>
+          <a :href="admin_rul" target="_blank" style="text-decoration: none;">Admin</a>
       </el-menu-item>
       <span style="float:right;margin-top:18px;margin-right:15px;font-style:italic;">Welcome {{getLoginUser()}}</span>
     </el-menu>
@@ -16,24 +32,31 @@
 </template>
 
 <script>
-import { logout, isLoggedIn, getLoginUser } from '../../utils/auth'
-
+import { logout, isLoggedIn, getLoginUser } from '../utils/auth'
+const BASE_URL = process.env.URL_ROOT
 export default {
   name: 'Header',
   data () {
     return {
-      logoUrl: 'static/img/ipros.png',
-      activeIndex: '1'
+      logoUrl: './static/img/ipros.png',
+      activeIndex: '1',
+      admin_rul: BASE_URL + '/admin',
+      params: {
+        self: this,
+        keys: null,
+        page: 1
+      }
     }
   },
   created: function () {
     if (!isLoggedIn()) {
       this.$router.push({ name: 'Login' })
     }
-    this.$store.dispatch('loadFuncGroup')
-    this.$store.dispatch('loadStatus')
-    this.$store.dispatch('loadCustomers')
     this.$store.dispatch('loadToken')
+    this.$store.dispatch('loadFuncGroup', this.params)
+    this.$store.dispatch('loadStatus', this.params)
+    this.$store.dispatch('loadCustomers', this.params)
+    this.$store.dispatch('loadUsers', this.params)
     this.loadTickets()
   },
   methods: {
@@ -51,18 +74,17 @@ export default {
       this.$router.push({ name: 'Home' })
     },
     loadSuplogs () {
-      let params = {
-        keys: null,
-        page: 1
-      }
-      this.$store.dispatch('loadCustomers')
-      this.$store.dispatch('loadReporter')
-      this.$store.dispatch('loadSupStatus')
-      this.$store.dispatch('loadSupTypes')
-      this.$store.dispatch('loadModules')
-      this.$store.dispatch('loadUsers')
-      this.$store.dispatch('loadSupLogs', params)
+      this.$store.dispatch('loadCustomers', this.params)
+      this.$store.dispatch('loadReporter', this.params)
+      this.$store.dispatch('loadSupStatus', this.params)
+      this.$store.dispatch('loadSupTypes', this.params)
+      this.$store.dispatch('loadModules', this.params)
+      this.$store.dispatch('loadUsers', this.params)
+      this.$store.dispatch('loadSupLogs', this.params)
       this.$router.push({ name: 'SupLog' })
+    },
+    loadEnvs () {
+      this.$message.info('Not implemented, Coming soon !')
     }
   }
 }

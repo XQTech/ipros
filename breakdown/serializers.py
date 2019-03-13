@@ -24,14 +24,32 @@ class BreakdownSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class TicketSerializer(serializers.ModelSerializer):
+    bkcount = serializers.SerializerMethodField()
+
+    def get_bkcount(self, obj):
+        return obj.breakdowns.count()
+
     class Meta:
         model = Ticket
         fields = '__all__'
 
-class CategorySerializer(serializers.ModelSerializer):
+class SubCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = BreakdownCategory
         fields = '__all__'
+
+class CategorySerializer(serializers.ModelSerializer):
+    sub_category = SubCategorySerializer(many=True)
+    class Meta:
+        model = BreakdownCategory
+        fields = ('id','code','parent','sub_category')
+
+
+# class CategorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = BreakdownCategory
+#         fields = '__all__'
+
 
 
 

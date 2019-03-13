@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
   state: {
@@ -11,9 +9,9 @@ export default {
     }
   },
   actions: {
-    loadModules ({commit}) {
+    loadModules ({commit}, params) {
       console.log('>>>loading modules....')
-      axios.get('http://localhost:8000/api/sup/systems/')
+      params.self.$http.get('/api/sup/systems/')
         .then(response => {
           console.log(response.data)
           commit('SET_MODULE', response.data)

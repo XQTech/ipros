@@ -8,7 +8,7 @@
     <div class="button-bar">
       <el-button
         type="primary"
-        icon="el-icon-plus"
+        icon="fa fa-plus"
         @click="handleCreate()"></el-button>
     </div>
     <el-table
@@ -21,9 +21,16 @@
       </el-table-column>
       <el-table-column
         label="Category"
-        width="100">
+        width="180">
         <template slot-scope="scope">
-          <span>{{getCategorybyID(scope.row.category)}}</span>
+          <span>{{getParentCategory(scope.row.category)}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="Sub Category"
+        width="180">
+        <template slot-scope="scope">
+          <span>{{getSubCategory(scope.row.category)}}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -69,10 +76,10 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"></el-button>
           <el-button
-          size="mini"
-          type="primary"
-          icon="el-icon-picture"
-          @click="handleUpdateImage(scope.row)"></el-button>
+            size="mini"
+            type="primary"
+            icon="el-icon-picture"
+            @click="handleUpdateImage(scope.row)"></el-button>
           <el-popover
             placement="top"
             width="160"
@@ -80,13 +87,14 @@
             <p>Are you sure to delete?</p>
             <div style="text-align: right; margin: 0">
               <el-button size="mini" type="text" @click="visible = []">Cancel</el-button>
-              <el-button type="primary" size="mini" @click="handleDelete(scope)">Yes</el-button>
+              <el-button type="primary" size="mini" @click="handleDelete(scope)"
+                style="margin-left:10px;">Yes</el-button>
             </div>
             <el-button
-                size="mini"
-                type="danger"
-                slot="reference"
-                icon="el-icon-delete"></el-button>
+              size="mini"
+              type="danger"
+              slot="reference"
+              icon="el-icon-delete"></el-button>
           </el-popover>
         </template>
       </el-table-column>
@@ -94,19 +102,16 @@
     <Breakdown
       ref="breakdownForm"
       v-on:createBreakdown="createBreakdown"
-      v-on:updateBreakdown="updateBreakdown"
-      v-on:deleteBreakdown="deleteBreakdown"></Breakdown>
+      v-on:updateBreakdown="updateBreakdown"></Breakdown>
     <UploadImage
-      ref="imageForm"
-      v-on:loadBreakdowns="loadBreakdowns"></UploadImage>
+      ref="imageForm"></UploadImage>
   </div>
 </template>
 
 <script>
 import Breakdown from './Breakdown'
 import UploadImage from './UploadImage'
-import axios from 'axios'
-import { getAccessToken } from '../../utils/auth'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Breakdowns',
@@ -118,14 +123,23 @@ export default {
   data () {
     return {
       visible: [],
-      breakdowns: []
+      params: {
+        self: this,
+        keys: null,
+        page: 1,
+        item: null,
+        id: 0
+      }
     }
   },
   mounted: function () {
-    console.log('breakdown mounted...')
-    this.loadBreakdowns()
+    this.params.id = this.selectedTicket.id
+    this.$store.dispatch('loadBreakdowns', this.params)
   },
   computed: {
+    ...mapState({
+      breakdowns: state => state.breakdown.breakdowns
+    }),
     getStatusbyID () {
       return function (id) {
         return this.$store.getters.getStatusById(id)
@@ -136,9 +150,31 @@ export default {
         return this.$store.getters.getFuncGroupById(id)
       }
     },
-    getCategorybyID () {
+    getSubCategory () {
       return function (id) {
-        return this.$store.getters.getCategoryById(id)
+        if (id === null) {
+          return ''
+        }
+        let cat = this.$store.getters.getCategoryById(id)
+        if (cat.parent === null) {
+          return ''
+        } else {
+          return cat.code
+        }
+      }
+    },
+    getParentCategory () {
+      return function (id) {
+        if (id === null) {
+          return ''
+        }
+        let cat = this.$store.getters.getCategoryById(id)
+        if (cat.parent === null) {
+          return cat.code
+        } else {
+          let parent = this.$store.getters.getCategoryById(cat.parent)
+          return parent.code
+        }
       }
     },
     getUserbyID () {
@@ -149,30 +185,19 @@ export default {
   },
   methods: {
     goHome () {
-      let params = {
-        keys: null,
-        page: 1
-      }
-      this.$store.dispatch('loadDocs')
-      this.$store.dispatch('loadTickets', params)
-    },
-    loadBreakdowns () {
-      axios.get('http://localhost:8000/api/breakdowns/' + this.selectedTicket.id + '/breakdowns/')
-        .then(response => {
-          console.log('printing result from api.....')
-          console.log(response)
-          console.log(response.data)
-          this.breakdowns = response.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
+      this.$store.dispatch('loadDocs', this.params)
+      this.$store.dispatch('loadTickets', this.params)
     },
     handleDelete (scope) {
       this.visible = []
-      console.log(scope.row)
-      this.deleteBreakdown(scope.row.id)
-      this.breakdowns = this.breakdowns.filter(item => item.id !== scope.row.id)
+      this.params.id = scope.row.id
+      this.$store.dispatch('deleteBreakdown', this.params)
+        .then(response => {
+          this.$message.success('Delete successfully')
+        })
+        .catch(error => {
+          this.$message.error(error.message)
+        })
     },
     handleUpdate (breakdown) {
       this.$refs.breakdownForm.updateBreakdown(breakdown)
@@ -186,15 +211,10 @@ export default {
       this.$refs.imageForm.showImageForm(breakdown)
     },
     createBreakdown (breakdown) {
-      console.log('>>>create breakdown....')
-      console.log(breakdown)
-      axios.post('http://localhost:8000/api/breakdowns/', breakdown, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-          'X-CSRFToken': this.$store.state.constants.csrToken
-        }})
+      this.params.item = breakdown
+      this.$store.dispatch('createBreakdown', this.params)
         .then(response => {
           this.$message.success('Create successfully')
-          this.loadBreakdowns()
         })
         .catch(error => {
           this.$message.error(error.message)
@@ -214,26 +234,10 @@ export default {
         due_date: breakdown.due_date,
         create_user: breakdown.create_user
       }
-      console.log('>>>update breakdown....')
-      axios.put('http://localhost:8000/api/breakdowns/' + breakdown.id + '/', tempBreakdown, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-          'X-CSRFToken': this.$store.state.constants.csrToken
-        }})
+      this.params.item = tempBreakdown
+      this.$store.dispatch('updateBreakdown', this.params)
         .then(response => {
           this.$message.success('Update successfully')
-        })
-        .catch(error => {
-          this.$message.error(error.message)
-        })
-    },
-    deleteBreakdown (breakdownId) {
-      console.log('>>>delete breakdown....' + breakdownId)
-      axios.delete('http://localhost:8000/api/breakdowns/' + breakdownId + '/', {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
-          'X-CSRFToken': this.$store.state.constants.csrToken
-        }})
-        .then(response => {
-          this.$message.success('Delete successfully')
         })
         .catch(error => {
           this.$message.error(error.message)
@@ -245,4 +249,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-button {
+    margin-left: 0;
+}
 </style>

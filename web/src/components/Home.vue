@@ -7,7 +7,7 @@
 import Tickets from './Tickets'
 import Breakdowns from './Breakdowns'
 import { mapState } from 'vuex'
-import { logout, isLoggedIn, getLoginUser } from '../../utils/auth'
+import { logout, isLoggedIn, getLoginUser } from '../utils/auth'
 
 export default {
   name: 'Home',
@@ -18,17 +18,22 @@ export default {
   data () {
     return {
       logoUrl: './static/img/ipros.png',
-      activeIndex: '1'
+      activeIndex: '1',
+      params: {
+        self: this,
+        keys: null,
+        page: 1
+      }
     }
   },
   created: function () {
     if (!isLoggedIn()) {
       this.$router.push({ name: 'Login' })
     }
-    this.$store.dispatch('loadFuncGroup')
-    this.$store.dispatch('loadStatus')
     this.$store.dispatch('loadToken')
-    this.$store.dispatch('loadUsers')
+    this.$store.dispatch('loadFuncGroup', this.params)
+    this.$store.dispatch('loadStatus', this.params)
+    this.$store.dispatch('loadUsers', this.params)
   },
   computed: {
     ...mapState({
@@ -48,12 +53,8 @@ export default {
       this.$router.push({ name: 'Login' })
     },
     loadTickets () {
-      let params = {
-        keys: null,
-        page: 1
-      }
-      this.$store.dispatch('loadDocs')
-      this.$store.dispatch('loadTickets', params)
+      this.$store.dispatch('loadDocs', this.params)
+      this.$store.dispatch('loadTickets', this.params)
     }
   }
 }

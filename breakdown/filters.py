@@ -10,5 +10,6 @@ class TicketFilter(django_filters.FilterSet):
             'assignee': ['icontains',],
             'ticket_no': ['icontains',],
             'summary': ['icontains',],
-            'gn_no': ['icontains']
+            'gn_no': ['icontains'],
+            'jira_id': ['iexact']
         }

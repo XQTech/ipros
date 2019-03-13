@@ -5,8 +5,9 @@ from rest_framework import permissions, viewsets, status
 from suplog import serializers as supSerializer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from django.contrib.auth.models import User
 from datetime import datetime
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import SuplogFilter
 
 # Create your views here.
 @api_view(['GET'])
@@ -29,6 +30,8 @@ class SuplogViewSet(viewsets.ModelViewSet):
     
     queryset = Suplog.objects.all()
     serializer_class = supSerializer.SuplogSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = SuplogFilter
 
 class SuplogSummaryViewSet(APIView):
     
@@ -74,8 +77,4 @@ class TypeViewSet(viewsets.ModelViewSet):
     serializer_class = supSerializer.TypeSerializer
     pagination_class = None
 
-class UsersViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = supSerializer.UserSerializer
-    pagination_class = None
 

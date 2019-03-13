@@ -14,7 +14,6 @@ router.register(r'statuss', views.StatusViewSet)
 router.register(r'customers', views.CustomerViewSet)
 router.register(r'reporters', views.CustomerStaffViewSet)
 router.register(r'types', views.TypeViewSet)
-router.register(r'users', views.UsersViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 # The API URLs are now determined automatically by the router.

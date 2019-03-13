@@ -2,18 +2,58 @@
   <div>
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>Support Logs</el-breadcrumb-item>
-      <el-breadcrumb-item>List</el-breadcrumb-item>
+      <el-breadcrumb-item>List (Total - {{totalCount}})</el-breadcrumb-item>
     </el-breadcrumb>
-    <div class="button-bar">
-      <el-button
+    <el-form :inline="true" style="display:flex;">
+      <el-form-item>
+        <el-select v-model="searchKeys.customer" placeholder="Customer">
+          <el-option v-for="item in customers"
+            v-bind:key="item.id"
+            :label="item.name"
+            :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="searchKeys.assignee" placeholder="Supporter">
+          <el-option v-for="item in users"
+            v-bind:key="item.id"
+            :label="item.username"
+            :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="searchKeys.system" placeholder="System">
+          <el-option v-for="item in modules"
+            v-bind:key="item.id"
+            :label="item.name"
+            :value="item.id"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-input placeholder="Issue Detail" v-model="searchKeys.description__icontains" style="width:300px;"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input placeholder="Solution" v-model="searchKeys.solution__icontains" style="width:300px;"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="loadSuplogs(1)" icon="fa fa-search"></el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleReset()" icon="fa fa-undo"></el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button
         type="primary"
-        icon="el-icon-view"
-        @click="handleSummary()"></el-button>
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
+        icon="fa fa-plus"
         @click="handleCreate()"></el-button>
-    </div>
+      </el-form-item>
+      <el-form-item>
+        <el-button
+        type="primary"
+        icon="fa fa-bar-chart"
+        @click="handleSummary()"></el-button>
+      </el-form-item>
+    </el-form>
     <el-table
       :data="suplogs"
       style="width: 100%">
@@ -126,8 +166,7 @@
 import { mapState } from 'vuex'
 import SuplogDetail from './SuplogDetail'
 import SuplogSummary from './SuplogSummary'
-import { isLoggedIn } from '../../utils/auth'
-// import axios from 'axios'
+import { isLoggedIn } from '../utils/auth'
 
 export default {
   name: 'Suglogs',
@@ -137,6 +176,13 @@ export default {
   },
   data () {
     return {
+      searchKeys: {
+        customer: '',
+        assignee: '',
+        description__icontains: '',
+        solution__icontains: '',
+        system: ''
+      },
       columns: [
         'Customer',
         'System',
@@ -150,20 +196,27 @@ export default {
         'Status',
         'Type'
       ],
-      visible: []
+      visible: [],
+      params: {
+        self: this,
+        keys: null,
+        page: 1,
+        item: null,
+        id: 0
+      }
     }
   },
   created: function () {
     if (!isLoggedIn()) {
       this.$router.push({ name: 'Login' })
     }
-    this.$store.dispatch('loadReporter')
-    this.$store.dispatch('loadSupStatus')
-    this.$store.dispatch('loadCustomers')
-    this.$store.dispatch('loadSupTypes')
     this.$store.dispatch('loadToken')
-    this.$store.dispatch('loadModules')
-    this.$store.dispatch('loadUsers')
+    this.$store.dispatch('loadReporter', this.params)
+    this.$store.dispatch('loadSupStatus', this.params)
+    this.$store.dispatch('loadCustomers', this.params)
+    this.$store.dispatch('loadSupTypes', this.params)
+    this.$store.dispatch('loadModules', this.params)
+    this.$store.dispatch('loadUsers', this.params)
   },
   computed: {
     ...mapState({
@@ -209,18 +262,17 @@ export default {
   },
   methods: {
     loadSuplogs (page) {
-      let params = {
-        keys: null,
-        page: page
-      }
-      this.$store.dispatch('loadSupLogs', params)
+      this.params.page = page
+      this.params.keys = this.searchKeys
+      this.$store.dispatch('loadSupLogs', this.params)
     },
     handleCreate () {
       this.$refs.suplogform.addSuplog()
     },
     handleDelete (scope) {
       this.visible = []
-      this.$store.dispatch('deleteSupLog', scope.row.id)
+      this.params.id = scope.row.id
+      this.$store.dispatch('deleteSupLog', this.params)
         .then(response => {
           this.$message.success('Deleted Successfully!')
         })
@@ -232,7 +284,8 @@ export default {
       this.$refs.suplogform.updateSuplog(suplog)
     },
     createSuplog (suplog) {
-      this.$store.dispatch('createSuplog', suplog)
+      this.params.item = suplog
+      this.$store.dispatch('createSuplog', this.params)
         .then(response => {
           this.$message.success('Created Successfully!')
           // this.loadSuplogs(1)
@@ -242,7 +295,8 @@ export default {
         })
     },
     updateSuplog (suplog) {
-      this.$store.dispatch('updateSuplog', suplog)
+      this.params.item = suplog
+      this.$store.dispatch('updateSuplog', this.params)
         .then(response => {
           this.$message.success('Update Successfully!')
         })
@@ -252,6 +306,11 @@ export default {
     },
     handleSummary () {
       this.$refs.summaryDialog.show()
+    },
+    handleReset () {
+      for (var key in this.searchKeys) {
+        this.searchKeys[key] = ''
+      }
     }
   }
 }
