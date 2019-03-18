@@ -30,7 +30,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Description" :label-width="formLabelWidth">
-            <el-input type="textarea" :rows="6" v-model="selectedBreakdown.description" style="width:80%;"
+            <el-input type="textarea" :rows="7" v-model="selectedBreakdown.description" style="width:80%;"
             placeholder="Add short description between '{' and '}' to be used in effort excel"></el-input>
           </el-form-item>
         </el-col>
@@ -52,7 +52,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Effort" :label-width="formLabelWidth">
-            <el-input-number v-model="selectedBreakdown.effort"></el-input-number>
+            <el-input-number v-model="selectedBreakdown.effort" :precision="1" :step="0.5"></el-input-number>
           </el-form-item>
           <el-form-item label="Due Date" :label-width="formLabelWidth">
             <el-date-picker
@@ -61,6 +61,20 @@
               value-format="yyyy-MM-dd"
               placeholder="Due Date">
             </el-date-picker>
+          </el-form-item>
+          <el-form-item label="in FD" :label-width="formLabelWidth">
+            <el-switch
+              v-model="selectedBreakdown.in_fd"
+              active-color="#13ce66"
+              inactive-color="#ff4949">
+            </el-switch>
+          </el-form-item>
+          <el-form-item label="in Breakdown" :label-width="formLabelWidth">
+            <el-switch
+              v-model="selectedBreakdown.in_bk"
+              active-color="#13ce66"
+              inactive-color="#ff4949">
+            </el-switch>
           </el-form-item>
         </el-col>
       </el-row>
@@ -85,7 +99,8 @@ export default {
       selectedTicket: null,
       isAdd: false,
       labelPosition: 'left',
-      selectedOptions: []
+      selectedOptions: [],
+      value3: true
     }
   },
   computed: {
@@ -138,7 +153,7 @@ export default {
         ticket: selectedTicket.id,
         sequence: 1,
         category: 1,
-        function_group: 1,
+        function_group: 22,
         description: '',
         status: 1,
         effort: 0,
@@ -147,6 +162,8 @@ export default {
         image2: null,
         image3: null,
         due_date: null,
+        in_fd: true,
+        in_bk: true,
         create_user: getLoginUser()
       }
       this.isAdd = true

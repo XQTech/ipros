@@ -6,6 +6,9 @@
     </el-breadcrumb>
     <el-form :inline="true" style="display:flex;">
       <el-form-item>
+        <el-input placeholder="ID, e.g. 10,11,12" v-model="searchKeys.id__in" style="width:200px;"></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-select v-model="searchKeys.customer" placeholder="Customer">
           <el-option v-for="item in customers"
             v-bind:key="item.id"
@@ -56,7 +59,13 @@
     </el-form>
     <el-table
       :data="suplogs"
-      style="width: 100%">
+      style="width: 100%"
+      @row-dblclick="handleUpdate">
+      <el-table-column
+        prop="id"
+        :label="columns[11]"
+        width="60">
+      </el-table-column>
       <el-table-column
         prop="customer"
         :label="columns[0]"
@@ -89,11 +98,15 @@
       </el-table-column>
       <el-table-column
         prop="description"
-        :label="columns[5]">
+        :label="columns[5]"
+        min-width="260"
+        :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         prop="solution"
-        :label="columns[6]">
+        :label="columns[6]"
+        min-width="260"
+        :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         :label="columns[7]"
@@ -118,7 +131,7 @@
       </el-table-column>
       <el-table-column
         :label="columns[10]"
-        width="100">
+        width="150">
         <template slot-scope="scope">
           <span>{{getTypebyID(scope.row.issueType)}}</span>
         </template>
@@ -177,6 +190,7 @@ export default {
   data () {
     return {
       searchKeys: {
+        pk__in: '',
         customer: '',
         assignee: '',
         description__icontains: '',
@@ -194,7 +208,8 @@ export default {
         'Supporter',
         'Reporter',
         'Status',
-        'Type'
+        'Type',
+        'ID'
       ],
       visible: [],
       params: {

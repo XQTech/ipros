@@ -1,5 +1,5 @@
 <template>
-    <div class="login-wrap" :style="{'background-image': 'url(' + require('../../static/img/'+backgroud+'.jpeg') + ')'}">
+    <div class="login-wrap" :style="{'background-image': 'url(' + imgurl + ')'}">
         <div class="ms-title">Log In</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px">
@@ -20,7 +20,7 @@
 
 <script>
 import { login, isLoggedIn } from '../utils/auth'
-
+const IMG_ROOT = process.env.IMG_ROOT
 export default {
   name: 'Login',
   components: {},
@@ -65,6 +65,11 @@ export default {
   },
   mounted () {
     this.backgroud = Math.round(Math.random() * 8)
+  },
+  computed: {
+    imgurl () {
+      return IMG_ROOT + '/' + this.backgroud + '.jpeg'
+    }
   },
   beforeUpdate () {},
   updated () {}

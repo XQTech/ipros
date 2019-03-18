@@ -75,7 +75,7 @@
           </el-form-item>
           <el-form-item label="Solution" :label-width="formLabelWidth">
             <el-input type="textarea" :rows="9" v-model="suplog.solution"
-              placeholder="Please input the solution details"></el-input>
+              placeholder="Put the related issue ID here, if needed, can search by multiple ID in the list page. e.g. 10,11,12"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -119,7 +119,7 @@ export default {
     },
     customerChange () {
       let suplog = this.suplog
-      suplog.reporter = this.reporters.filter(item => item.company === suplog.customer)[0]
+      suplog.reporter = this.reporters.filter(item => item.company === suplog.customer)[0].id
     },
     addSuplog () {
       this.suplog = {

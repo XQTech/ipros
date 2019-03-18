@@ -82,9 +82,7 @@ class Breakdown(models.Model):
     function_group = models.ForeignKey(FunctionGroup, null=True, on_delete=models.SET_NULL)
     description = models.TextField(max_length=500, null=True, blank=True)
     status = models.ForeignKey(Status, null=True, on_delete=models.SET_NULL)
-    effort = models.IntegerField(
-        default=0, validators=[MaxValueValidator(500),
-                               MinValueValidator(0)])
+    effort = models.FloatField(null=True, blank=True, default=0.0)        
     assigned_user = models.ForeignKey(
          settings.AUTH_USER_MODEL, related_name='breakdowns', on_delete=models.SET_NULL, null=True)
     image1 = models.ImageField(upload_to=upload_path_handler, null=True, blank=True)
@@ -93,6 +91,8 @@ class Breakdown(models.Model):
     due_date = models.DateField(null=True, blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     create_user = models.CharField(max_length=50, blank=True, null=True)
+    in_fd = models.BooleanField(default=True)
+    in_bk = models.BooleanField(default=True)
 
     class Meta:
         ordering = ('sequence', 'ticket', 'function_group', 'create_date')

@@ -7,5 +7,7 @@ class EnvitemFilter(django_filters.FilterSet):
         fields = {            
             'customer': ['exact',],
             'envtype': ['exact',],
+            'name': ['icontains',],
+            'url': ['icontains',],
             'remark': ['icontains',]
         }

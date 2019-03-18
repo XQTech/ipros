@@ -18,7 +18,7 @@
         </el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="refreshSummary()">Go !</el-button>
+        <el-button type="primary" @click="refreshSummary()" :loading="progressVisible">Go !</el-button>
       </el-form-item>
       <el-form-item>
         <span class="summary-total">Total: {{totalCount}} logs, {{totalHours}} hours</span>
@@ -69,7 +69,8 @@ export default {
       totalCount: 0,
       totalHours: 0,
       instance: this,
-      suplogs: []
+      suplogs: [],
+      progressVisible: false
     }
   },
   computed: {
@@ -87,6 +88,7 @@ export default {
       this.dialogFormVisible = true
     },
     refreshSummary () {
+      this.progressVisible = true
       let url = '/api/sup/suplogs-all/?start-time=' + this.startDate + '&end-time=' + this.endDate
       this.$http.get(url)
         .then(response => {
@@ -99,8 +101,10 @@ export default {
           this.generateSummary('bysystem', this.getPieChartData('system', this.getSystembyID()), 'System')
           this.generateSummary('bystatus', this.getPieChartData('status', this.getStatusbyID()), 'Issue Status')
           this.generateSummary('byreporter', this.getPieChartData('reporter', this.getReporterbyID()), 'Reporter')
+          this.progressVisible = false
         })
         .catch(error => {
+          this.progressVisible = false
           this.$message.error(error.message)
         })
     },

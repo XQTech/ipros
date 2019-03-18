@@ -38,9 +38,13 @@
       :data="ticketList"
       style="width: 100%">
       <el-table-column
-        prop="ticket_no"
         :label="columns[0]"
         width="120">
+        <template slot-scope="scope">
+          <a :href="getJiraPath(scope.row)"
+            target="_blank"
+            class="buttonText">{{scope.row.ticket_no}}</a>
+        </template>
       </el-table-column>
       <el-table-column
         prop="customer"
@@ -52,7 +56,9 @@
       </el-table-column>
       <el-table-column
         prop="summary"
-        :label="columns[3]">
+        :label="columns[3]"
+        min-width="260"
+        :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         prop="status"
@@ -197,12 +203,8 @@ export default {
       this.$http.get('/api/breakdowns/doc/' + ticket.id + '/')
         .then(response => {
           Vue.set(this.generating, index, false)
-          if (response.data === 'NO_BREAKDOWN_FOUND') {
-            this.$message.error('No breakdown found !')
-          } else {
-            this.$store.dispatch('loadDocs', this.params)
-            this.$message.success('Documents created !')
-          }
+          this.$store.dispatch('loadDocs', this.params)
+          this.$message.success('Documents created !')
         })
         .catch(error => {
           Vue.set(this.generating, index, false)
@@ -220,10 +222,13 @@ export default {
       return ''
     },
     getDocPath (ticket) {
-      return './static/media/breakdown/' + ticket.ticket_no + '/FD-' + ticket.ticket_no + '.docx'
+      return '../media/breakdown/' + ticket.ticket_no + '/FD-' + ticket.ticket_no + '.docx'
     },
     getXlxPath (ticket) {
-      return './static/media/breakdown/' + ticket.ticket_no + '/Breakdown-' + ticket.ticket_no + '.xlsx'
+      return '../media/breakdown/' + ticket.ticket_no + '/Breakdown-' + ticket.ticket_no + '.xlsx'
+    },
+    getJiraPath (ticket) {
+      return 'http://192.168.3.39:8080/browse/' + ticket.ticket_no
     },
     handleBreakdown (ticket) {
       this.params.item = ticket

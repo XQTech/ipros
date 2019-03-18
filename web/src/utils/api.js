@@ -12,10 +12,12 @@ export default {
           'X-CSRFToken': store.getters.csrTokenGetter
         }})
         .then(response => {
+          console.log(response)
           resolve(response)
         })
         .catch(error => {
-          reject(error)
+          console.log(error)
+          reject(error.response.data)
         })
     })
   },
@@ -29,7 +31,7 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error)
+          reject(error.response.data)
         })
     })
   },
@@ -43,7 +45,7 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error)
+          reject(error.response.data)
         })
     })
   },
@@ -58,7 +60,7 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error)
+          reject(error.response.data)
         })
     })
   },
@@ -72,7 +74,7 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error)
+          reject(error.response.data)
         })
     })
   }

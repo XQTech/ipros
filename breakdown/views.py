@@ -26,6 +26,7 @@ from django.db.models import Q
 from docx.shared import RGBColor
 from docx.enum.style import WD_STYLE_TYPE
 from datetime import datetime
+from common.exception_handler import APPError
 
 DOC_PATH = settings.MEDIA_ROOT + 'breakdown/'
 
@@ -220,7 +221,7 @@ class DocumentListView(APIView):
                 })
         return Response(data)
 
-class GenerateDocView(APIView):
+class GenerateDocView(APIView):    
     def get_ticket(self, pk):
         try:
             return Ticket.objects.get(pk=pk)
@@ -233,24 +234,25 @@ class GenerateDocView(APIView):
         except Breakdown.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):    
+    def get(self, request, pk, format=None):
         ticket = self.get_ticket(pk)
         breakdowns = self.get_breakdown(pk)
         if breakdowns == None or len(breakdowns) == 0:
-            return Response("NO_BREAKDOWN_FOUND")
+            raise APPError(message='No breakdown found!')
 
         docPath = DOC_PATH + ticket.ticket_no + '/'
         docName = docPath + 'FD-' + ticket.ticket_no + '.docx'
         xlsName = docPath + 'Breakdown-' + ticket.ticket_no + '.xlsx'
-        self.generateDoc(ticket, breakdowns, docName, docPath)
-        self.generateXls(ticket, breakdowns, xlsName, docPath)
+        self.generateDoc(ticket, breakdowns.filter(in_fd=1), docName, docPath)
+        self.generateXls(ticket, breakdowns.filter(in_bk=1), xlsName, docPath)
         return Response(docName)
 
     def generateDoc(self, ticket, breakdowns, docName, docPath):
+        print('generating doc..........')
+        print(len(breakdowns))
         document = Document()
         document.add_heading('FD - ' + ticket.ticket_no, 0)
         document.add_paragraph(ticket.summary)
-
         currentSubCategory = None
         currentFuncGroup = None
         currentParentCat = None
@@ -260,10 +262,11 @@ class GenerateDocView(APIView):
 
         font4 = styles['Heading 4'].font
         font4.color.rgb = RGBColor(0x00, 0x00, 0x00)
-
         for bk in breakdowns:
             category = bk.category
             funcGroup = bk.function_group
+            if category == None or funcGroup == None:
+                raise APPError(message='Category or Function Group is not defined!')
             # Add parent category
             if currentParentCat == None:
                 if category.parent == None:
@@ -285,17 +288,15 @@ class GenerateDocView(APIView):
                     currentParentCat = category.parent.id
                     document.add_heading(category.parent.code, level=1)
                     currentFuncGroup = None
-            
             # Add sub category
             if currentSubCategory == None or currentSubCategory != category.id:
                 currentSubCategory = category.id
                 currentFuncGroup = None
                 document.add_heading(category.code, level=2)
             # Add function group
-            if funcGroup.description != '---' and (currentFuncGroup == None or currentFuncGroup != funcGroup.id):
+            if funcGroup != None and funcGroup.description != '---' and (currentFuncGroup == None or currentFuncGroup != funcGroup.id):
                 currentFuncGroup = funcGroup.id
                 document.add_heading(funcGroup.description, level=4)
-
             try:
                 startIndex = bk.description.index('{')
                 endIndex = bk.description.index('}') + 1
@@ -314,16 +315,15 @@ class GenerateDocView(APIView):
 
             if bk.image3 != '':
                 document.add_picture(bk.image3, width=Inches(5.0))
-
         if os.path.exists(docName):
             os.remove(docName)
         if not os.path.isdir(docPath):
             os.mkdir(docPath)
-
         document.save(docName)
     
     def generateXls(self, ticket, breakdowns, docName, docPath):
-        breakdowns = breakdowns.filter(effort__gt=0)
+        # breakdowns = breakdowns.filter(effort__gt=0)
+        print('generating excel..........')
         wb = Workbook()
         ws = wb.active
         ws.title = 'Effort Breakdown'
@@ -349,18 +349,18 @@ class GenerateDocView(APIView):
         self.createCell(ws, startRow, startCol+3, titleFont, titleFill, thin_border, 'Items')
         self.createCell(ws, startRow, startCol+4, titleFont, titleFill, thin_border, 'Effort(mds)')
 
-        startRow += 1
-        self.createCell(ws, startRow, startCol, detailFont, None, thin_border, 1)
-        self.createCell(ws, startRow, startCol+1, detailFont, None, thin_border, 'Requirement Clarification')
-        self.createCell(ws, startRow, startCol+2, detailFont, None, thin_border, '')
-        self.createCell(ws, startRow, startCol+3, detailFont, None, thin_border, '1. Requirement Study\n2. Requirement Clarification')
-        self.createCell(ws, startRow, startCol+4, detailFont, None, thin_border, 0)
+        # startRow += 1
+        # self.createCell(ws, startRow, startCol, detailFont, None, thin_border, 1)
+        # self.createCell(ws, startRow, startCol+1, detailFont, None, thin_border, 'Requirement Clarification')
+        # self.createCell(ws, startRow, startCol+2, detailFont, None, thin_border, '')
+        # self.createCell(ws, startRow, startCol+3, detailFont, None, thin_border, '1. Requirement Study\n2. Requirement Clarification')
+        # self.createCell(ws, startRow, startCol+4, detailFont, None, thin_border, 0)
 
         currentSubCategory = None
         currentFuncGroup = None
         categoryStartRow = 0
         funcStartRow = 0
-        i = 1
+        i = 0
         devEffort = 0
         row = startRow
         for bk in breakdowns:
@@ -369,7 +369,8 @@ class GenerateDocView(APIView):
             self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
             category = bk.category
             funcGroup = bk.function_group
-
+            if category == None or funcGroup == None:
+                raise APPError(message='Category or Function Group is not defined!')
             self.createCell(ws, row, startCol+1, detailFont, None, thin_border, category.code)
             self.createCell(ws, row, startCol+2, detailFont, None, thin_border, funcGroup.description)
             try:
@@ -414,29 +415,29 @@ class GenerateDocView(APIView):
                 if funcStartRow < row:
                     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row, end_column=startCol+2)
 
-        row += 1
-        i += 1
-        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'QA Test')
-        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, '1.Prepare test  cases. \n2. Test execution')
-        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, devEffort * 0.15)
+        # row += 1
+        # i += 1
+        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'QA Test')
+        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, '1.Prepare test  cases. \n2. Test execution')
+        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, devEffort * 0.15)
 
-        row += 1
-        i += 1
-        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Deployment')
-        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'To both testing and live servers')
-        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 1)
+        # row += 1
+        # i += 1
+        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Deployment')
+        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'To both testing and live servers')
+        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 1)
 
-        row += 1
-        i += 1
-        self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Support&Warranty')
-        self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'Support Customer Testing and Warranty')
-        self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 0)
+        # row += 1
+        # i += 1
+        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
+        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Support&Warranty')
+        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
+        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'Support Customer Testing and Warranty')
+        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 0)
 
         formula = '=SUM(F' + str(startRow) + ':F' + str(row) + ')'
         self.createCell(ws, row + 1, startCol+4, titleFont, titleFill, None, formula)

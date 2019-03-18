@@ -22,6 +22,12 @@
         </el-select>
       </el-form-item>
       <el-form-item>
+        <el-input placeholder="Item Name" v-model="searchKeys.name__icontains" style="width:200px;"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-input placeholder="HOST/IP" v-model="searchKeys.url__icontains" style="width:200px;"></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-input placeholder="Remarks" v-model="searchKeys.remark__icontains" style="width:400px;"></el-input>
       </el-form-item>
       <el-form-item>
@@ -39,7 +45,8 @@
     </el-form>
     <el-table
       :data="envItems"
-      style="width: 100%">
+      style="width: 100%"
+      @row-dblclick="handleUpdate">
       <el-table-column
         :label="columns[0]"
         width="100">
@@ -57,28 +64,31 @@
       <el-table-column
         prop="name"
         :label="columns[2]"
-        width="150">
+        width="180">
       </el-table-column>
       <el-table-column
         prop="url"
         :label="columns[3]"
-        width="200">
+        width="300">
       </el-table-column>
       <el-table-column
         prop="username"
         :label="columns[4]"
-        width="120">
+        width="180">
       </el-table-column>
       <el-table-column
         prop="password"
         :label="columns[5]"
-        width="120">
+        width="200">
       </el-table-column>
       <el-table-column
         prop="remark"
-        :label="columns[6]">
+        :label="columns[6]"
+        min-width="260"
+        :show-overflow-tooltip="true">
       </el-table-column>
-      <el-table-column label="Action" width="150">
+      <el-table-column
+        label="Action" width="150">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -125,6 +135,8 @@ export default {
       searchKeys: {
         customer: '',
         envtype: '',
+        name__icontains: '',
+        url__icontains: '',
         remark__icontains: ''
       },
       columns: [

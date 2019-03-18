@@ -13,7 +13,8 @@
     </div>
     <el-table
       :data="breakdowns"
-      style="width: 100%">
+      style="width: 100%"
+      @row-dblclick="handleUpdate">
       <el-table-column
         prop="sequence"
         label="SN"
@@ -34,15 +35,17 @@
         </template>
       </el-table-column>
       <el-table-column
-        label="Function"
-        width="120">
+        label="Function Group"
+        width="200">
         <template slot-scope="scope">
           <span>{{getFuncGroupbyID(scope.row.function_group)}}</span>
         </template>
       </el-table-column>
       <el-table-column
         prop="description"
-        label="Description">
+        label="Description"
+        min-width="260"
+        :show-overflow-tooltip="true">
       </el-table-column>
       <el-table-column
         prop="effort"
@@ -67,6 +70,22 @@
         prop="due_date"
         label="Due Date"
         width="100">
+      </el-table-column>
+      <el-table-column
+        label="in FD"
+        width="100">
+        <template slot-scope="scope">
+          <i class="fa fa-check" v-if="scope.row.in_fd"></i>
+          <i class="fa fa-times" v-else></i>
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="in Eft Bk"
+        width="100">
+        <template slot-scope="scope">
+          <i class="fa fa-check" v-if="scope.row.in_bk"></i>
+          <i class="fa fa-times" v-else></i>
+        </template>
       </el-table-column>
       <el-table-column label="Action" width="200">
         <template slot-scope="scope">
@@ -230,7 +249,9 @@ export default {
         effort: breakdown.effort,
         assigned_user: breakdown.assigned_user,
         due_date: breakdown.due_date,
-        create_user: breakdown.create_user
+        create_user: breakdown.create_user,
+        in_fd: breakdown.in_fd,
+        in_bk: breakdown.in_bk
       }
       this.params.item = tempBreakdown
       this.$store.dispatch('updateBreakdown', this.params)

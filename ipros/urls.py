@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html")),
     path('breakdown/', RedirectView.as_view(url='/')),
     path('suplog/', RedirectView.as_view(url='/')),
+    path('envs/', RedirectView.as_view(url='/')),
     path('login/', RedirectView.as_view(url='/')),
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', obtain_jwt_token),

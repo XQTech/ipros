@@ -4,7 +4,8 @@ import django_filters
 class SuplogFilter(django_filters.FilterSet):
     class Meta:
         model = Suplog
-        fields = {            
+        fields = {
+            'id':['in'],
             'status': ['exact',],
             'customer': ['exact',],
             'assignee': ['exact',],
