@@ -26,7 +26,7 @@ from django.db.models import Q
 from docx.shared import RGBColor
 from docx.enum.style import WD_STYLE_TYPE
 from datetime import datetime
-from common.exception_handler import APPError
+from common.exception_handler import DataUnavailable
 
 DOC_PATH = settings.MEDIA_ROOT + 'breakdown/'
 
@@ -238,7 +238,7 @@ class GenerateDocView(APIView):
         ticket = self.get_ticket(pk)
         breakdowns = self.get_breakdown(pk)
         if breakdowns == None or len(breakdowns) == 0:
-            raise APPError(message='No breakdown found!')
+            raise DataUnavailable('No breakdown found!', 'Data_Unavailable')
 
         docPath = DOC_PATH + ticket.ticket_no + '/'
         docName = docPath + 'FD-' + ticket.ticket_no + '.docx'
@@ -249,7 +249,6 @@ class GenerateDocView(APIView):
 
     def generateDoc(self, ticket, breakdowns, docName, docPath):
         print('generating doc..........')
-        print(len(breakdowns))
         document = Document()
         document.add_heading('FD - ' + ticket.ticket_no, 0)
         document.add_paragraph(ticket.summary)
@@ -266,7 +265,7 @@ class GenerateDocView(APIView):
             category = bk.category
             funcGroup = bk.function_group
             if category == None or funcGroup == None:
-                raise APPError(message='Category or Function Group is not defined!')
+                raise DataUnavailable('Category or Function Group is not defined!', 'Data_Unavailable')
             # Add parent category
             if currentParentCat == None:
                 if category.parent == None:
@@ -322,7 +321,6 @@ class GenerateDocView(APIView):
         document.save(docName)
     
     def generateXls(self, ticket, breakdowns, docName, docPath):
-        # breakdowns = breakdowns.filter(effort__gt=0)
         print('generating excel..........')
         wb = Workbook()
         ws = wb.active
@@ -370,7 +368,7 @@ class GenerateDocView(APIView):
             category = bk.category
             funcGroup = bk.function_group
             if category == None or funcGroup == None:
-                raise APPError(message='Category or Function Group is not defined!')
+                raise DataUnavailable('Category or Function Group is not defined!', 'Data_Unavailable')
             self.createCell(ws, row, startCol+1, detailFont, None, thin_border, category.code)
             self.createCell(ws, row, startCol+2, detailFont, None, thin_border, funcGroup.description)
             try:

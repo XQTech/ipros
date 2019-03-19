@@ -197,7 +197,7 @@ export default {
           this.$message.success('Deleted Successfully!')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleUpdate (envitem) {
@@ -210,7 +210,7 @@ export default {
           this.$message.success('Created Successfully!')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     updateEnvItem (envitem) {
@@ -220,7 +220,7 @@ export default {
           this.$message.success('Update Successfully!')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleReset () {

@@ -105,7 +105,7 @@ export default {
         })
         .catch(error => {
           this.progressVisible = false
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     getPieChartData (field, f) {

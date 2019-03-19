@@ -16,8 +16,13 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          console.log(error)
-          reject(error.response.data)
+          if (error.response === undefined ||
+            error.response.data === undefined ||
+            error.response.data.detail === undefined) {
+            reject(error.message)
+          } else if (error.response.data.detail !== undefined) {
+            reject(error.response.data.detail)
+          }
         })
     })
   },
@@ -31,7 +36,13 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error.response.data)
+          if (error.response === undefined ||
+            error.response.data === undefined ||
+            error.response.data.detail === undefined) {
+            reject(error.message)
+          } else if (error.response.data.detail !== undefined) {
+            reject(error.response.data.detail)
+          }
         })
     })
   },
@@ -45,7 +56,13 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error.response.data)
+          if (error.response === undefined ||
+            error.response.data === undefined ||
+            error.response.data.detail === undefined) {
+            reject(error.message)
+          } else if (error.response.data.detail !== undefined) {
+            reject(error.response.data.detail)
+          }
         })
     })
   },
@@ -60,7 +77,13 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error.response.data)
+          if (error.response === undefined ||
+            error.response.data === undefined ||
+            error.response.data.detail === undefined) {
+            reject(error.message)
+          } else if (error.response.data.detail !== undefined) {
+            reject(error.response.data.detail)
+          }
         })
     })
   },
@@ -74,7 +97,13 @@ export default {
           resolve(response)
         })
         .catch(error => {
-          reject(error.response.data)
+          if (error.response === undefined ||
+            error.response.data === undefined ||
+            error.response.data.detail === undefined) {
+            reject(error.message)
+          } else if (error.response.data.detail !== undefined) {
+            reject(error.response.data.detail)
+          }
         })
     })
   }

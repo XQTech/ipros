@@ -64,7 +64,7 @@ export default {
         .then(response => {
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleExceed () {
@@ -84,7 +84,7 @@ export default {
         .then(response => {
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     }
   }

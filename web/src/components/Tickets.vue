@@ -195,7 +195,7 @@ export default {
         })
         .catch(error => {
           Vue.set(this.uploading, index, false)
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleGenerateDoc (ticket, index) {
@@ -208,7 +208,7 @@ export default {
         })
         .catch(error => {
           Vue.set(this.generating, index, false)
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     getDocName (ticket) {
@@ -252,19 +252,19 @@ export default {
                   let ticket = this.getUpdatedTicket(issue, resp)
                   this.$http.put('/api/tickets/' + ticket.id + '/', ticket)
                     .catch(error => {
-                      this.$message.error(error.message)
+                      this.$message.error(error)
                     })
                   this.oldCount++
                 } else {
                   this.$http.post('/api/tickets/', this.getNewTicket(issue))
                     .catch(error => {
-                      this.$message.error(error.message)
+                      this.$message.error(error)
                     })
                   this.newCount++
                 }
               })
               .catch(error => {
-                this.$message.error(error.message)
+                this.$message.error(error)
               })
           })
           setTimeout(() => {

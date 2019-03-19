@@ -215,7 +215,7 @@ export default {
           this.$message.success('Delete successfully')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleUpdate (breakdown) {
@@ -234,7 +234,7 @@ export default {
           this.$message.success('Create successfully')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     updateBreakdown (breakdown) {
@@ -259,7 +259,7 @@ export default {
           this.$message.success('Update successfully')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     }
   }

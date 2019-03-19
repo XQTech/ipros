@@ -292,7 +292,7 @@ export default {
           this.$message.success('Deleted Successfully!')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleUpdate (suplog) {
@@ -306,7 +306,7 @@ export default {
           // this.loadSuplogs(1)
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     updateSuplog (suplog) {
@@ -316,7 +316,7 @@ export default {
           this.$message.success('Update Successfully!')
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     handleSummary () {

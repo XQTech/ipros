@@ -30,7 +30,7 @@ export default {
           commit('SET_BREAKDOWNS', response.data)
         })
         .catch(error => {
-          this.$message.error(error.message)
+          this.$message.error(error)
         })
     },
     deleteBreakdown ({commit}, params) {
