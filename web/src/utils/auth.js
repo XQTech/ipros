@@ -17,7 +17,6 @@ export function login (username, password) {
   const url = `${BACKEND_URL}/api-token-auth/`
   axios.post(url, { username: username, password: password })
     .then(function (response) {
-      console.log(response)
       localStorage.setItem(ACCESS_TOKEN_KEY, response.data.token)
       localStorage.setItem(USER_NAME, response.data.username)
       localStorage.setItem(USER_ID, response.data.user_id)

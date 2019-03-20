@@ -75,7 +75,7 @@
       </el-table-column>
       <el-table-column
         :label="columns[1]"
-        width="80">
+        width="120">
         <template slot-scope="scope">
           <span>{{getSystembyID(scope.row.system)}}</span>
         </template>

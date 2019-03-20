@@ -13,7 +13,7 @@
           </el-form-item>
           <el-form-item label="System" :label-width="formLabelWidth">
             <el-select v-model="suplog.system" placeholder="------">
-              <el-option v-for="cus in systems"
+              <el-option v-for="cus in systems" v-if="cus.customer.includes(suplog.customer)"
                 v-bind:key="cus.id"
                 :label="cus.name"
                 :value="cus.id"></el-option>
@@ -122,7 +122,18 @@ export default {
     },
     customerChange () {
       let suplog = this.suplog
-      suplog.reporter = this.reporters.filter(item => item.company === suplog.customer)[0].id
+      let reporter = this.reporters.filter(item => item.company === suplog.customer)[0]
+      if (reporter !== undefined) {
+        suplog.reporter = reporter.id
+      } else {
+        suplog.reporter = null
+      }
+      let system = this.systems.filter(item => item.customer.includes(suplog.customer))[0]
+      if (system !== undefined) {
+        suplog.system = system.id
+      } else {
+        suplog.system = null
+      }
     },
     addSuplog () {
       this.suplog = {
