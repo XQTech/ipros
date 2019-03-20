@@ -1,22 +1,17 @@
 from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, BreakdownCategory
 from breakdown import serializers as bds
-from breakdown.permissions import IsOwnerOrReadOnly
-from rest_framework import permissions, viewsets, status
+from rest_framework import viewsets
 from django.http import Http404
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.views import obtain_jwt_token
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from django.contrib.auth.models import User
 from .filters import TicketFilter
 from jira import JIRA
-from django.views import View
 from django.conf import settings
-import os
 from docx import Document
 from docx.shared import Inches
 from openpyxl import Workbook
@@ -24,9 +19,9 @@ from openpyxl.styles import Fill, Border, Side, PatternFill, Alignment, Font, Co
 from openpyxl.styles.colors import WHITE
 from django.db.models import Q
 from docx.shared import RGBColor
-from docx.enum.style import WD_STYLE_TYPE
 from datetime import datetime
 from common.exception_handler import DataUnavailable
+import os
 
 DOC_PATH = settings.MEDIA_ROOT + 'breakdown/'
 
@@ -60,6 +55,7 @@ class BreakdownViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class UploadImageView(APIView):
+    queryset = Breakdown.objects.none()
     def get_object(self, pk):
         try:
             return Breakdown.objects.get(pk=pk)
@@ -117,21 +113,21 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 # For auth with JWT
-class RestrictedView(APIView):
-    permission_classes = (IsAuthenticated, )
-    authentication_classes = (JSONWebTokenAuthentication, )
+# class RestrictedView(APIView):
+#     permission_classes = (IsAuthenticated, )
+#     authentication_classes = (JSONWebTokenAuthentication, )
 
-    def get(self, request):
-        data = {
-            'id': request.user.id,
-            'username': request.user.username,
-            'token': str(request.auth)
-        }
-        return Response(data)
+#     def get(self, request):
+#         data = {
+#             'id': request.user.id,
+#             'username': request.user.username,
+#             'token': str(request.auth)
+#         }
+#         return Response(data)
 
 class JiraView(APIView):
 
-    queryset = None
+    queryset = Breakdown.objects.none()
     serializer_class = None
     def get(self, request, format=None):
         """
@@ -159,7 +155,7 @@ class JiraView(APIView):
 
 class UploadToJiraView(APIView):
 
-    queryset = None
+    queryset = Breakdown.objects.none()
     serializer_class = None
     def get_ticket(self, pk):
         try:
@@ -195,7 +191,7 @@ class UploadToJiraView(APIView):
         
 
 class DocumentListView(APIView):
-    queryset = None
+    queryset = Breakdown.objects.none()
     serializer_class = None
 
     def get(self, request, format=None):
@@ -221,7 +217,8 @@ class DocumentListView(APIView):
                 })
         return Response(data)
 
-class GenerateDocView(APIView):    
+class GenerateDocView(APIView):
+    queryset = Breakdown.objects.none()
     def get_ticket(self, pk):
         try:
             return Ticket.objects.get(pk=pk)

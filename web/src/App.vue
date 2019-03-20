@@ -6,6 +6,9 @@
     <el-main>
       <router-view></router-view>
     </el-main>
+    <!-- <el-footer>
+      <Footer></Footer>
+    </el-footer> -->
   </el-container>
   <div v-else id='App'>
     <router-view/>
@@ -14,10 +17,12 @@
 
 <script>
 import Header from '@/components/Header'
+import Footer from '@/components/Footer'
 export default {
   name: 'App',
   components: {
-    Header
+    Header,
+    Footer
   }
 }
 </script>

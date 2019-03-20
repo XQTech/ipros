@@ -35,7 +35,7 @@ export default {
           commit('SET_TICKETS', response.data)
         })
         .catch(error => {
-          console.log(error)
+          params.self.$message.error(error)
         })
     },
     loadDocs ({commit}, params) {

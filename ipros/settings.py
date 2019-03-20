@@ -156,25 +156,15 @@ USE_L10N = True
 
 USE_TZ = False
 
-# DATE_INPUT_FORMATS = ['%Y-%m-%d']
-# DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M']
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-#LOGIN_REDIRECT_URL = 'breakdown:TicketList'
 REST_FRAMEWORK = {
-    #'DEFAULT_AUTHENTICATION_CLASSES': (
-    #    'rest_framework.authentication.TokenAuthentication',
-    #),
-    #'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
-        #'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
-       'rest_framework.permissions.AllowAny',
+       'rest_framework.permissions.DjangoModelPermissions',
     ),
     'EXCEPTION_HANDLER': 'common.exception_handler.custom_exception_handler',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
@@ -183,5 +173,6 @@ REST_FRAMEWORK = {
 
 import datetime
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=8)
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=8),
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'common.utils.jwt_response_payload_handler'
 }

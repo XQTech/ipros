@@ -71,11 +71,13 @@
         <el-col :span="14">
           <el-form-item label="Description" :label-width="formLabelWidth">
             <el-input type="textarea" :rows="9" v-model="suplog.description"
-              placeholder="Please input the issue details"></el-input>
+              placeholder="Please input the issue details"
+              :maxlength=1000></el-input>
           </el-form-item>
           <el-form-item label="Solution" :label-width="formLabelWidth">
             <el-input type="textarea" :rows="9" v-model="suplog.solution"
-              placeholder="Put the related issue ID here, if needed, can search by multiple ID in the list page. e.g. 10,11,12"></el-input>
+              placeholder="Put the related issue ID here, if needed, can search by multiple ID in the list page. e.g. 10,11,12"
+              :maxlength=1000></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -89,6 +91,7 @@
 
 <script>
 import { mapState } from 'vuex'
+import { getLoginUser } from '../utils/auth'
 
 export default {
   name: 'SuplogDetail',
@@ -124,12 +127,12 @@ export default {
     addSuplog () {
       this.suplog = {
         status: 1,
-        customer: 1,
-        assignee: 4,
+        customer: 2,
+        assignee: getLoginUser().id,
         description: '',
-        reporter: 1,
+        reporter: 4,
         solution: '',
-        issueType: 1,
+        issueType: 2,
         sup_st_time: null,
         sup_ed_time: null,
         system: null

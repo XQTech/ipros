@@ -45,12 +45,6 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id','code','parent','sub_category')
 
 
-# class CategorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = BreakdownCategory
-#         fields = '__all__'
-
-
 
 
 

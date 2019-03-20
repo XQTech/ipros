@@ -33,8 +33,8 @@ class Suplog(models.Model):
     assignee = models.ForeignKey(
          settings.AUTH_USER_MODEL, related_name='suplog', on_delete=models.SET_NULL, null=True)
     reporter = models.ForeignKey(CustomerStaff, null=True, on_delete=models.SET_NULL)
-    description = models.TextField(max_length=500, null=True, blank=True)
-    solution = models.TextField(max_length=500, null=True, blank=True)
+    description = models.TextField(max_length=1000, null=True, blank=True)
+    solution = models.TextField(max_length=1000, null=True, blank=True)
     issueType = models.ForeignKey(Type, null=True, on_delete=models.SET_NULL)
     sup_st_time = models.DateTimeField(null=True, blank=True)
     sup_ed_time = models.DateTimeField(null=True, blank=True)

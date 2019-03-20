@@ -8,11 +8,10 @@ export default {
   get (url) {
     return new Promise((resolve, reject) => {
       axios.get(BASE_URL + url, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+        headers: { 'Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': store.getters.csrTokenGetter
         }})
         .then(response => {
-          console.log(response)
           resolve(response)
         })
         .catch(error => {
@@ -29,7 +28,7 @@ export default {
   post (url, data) {
     return new Promise((resolve, reject) => {
       axios.post(BASE_URL + url, data, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+        headers: { 'Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': store.getters.csrTokenGetter
         }})
         .then(response => {
@@ -49,7 +48,7 @@ export default {
   put (url, data) {
     return new Promise((resolve, reject) => {
       axios.put(BASE_URL + url, data, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+        headers: { 'Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': store.getters.csrTokenGetter
         }})
         .then(response => {
@@ -69,7 +68,7 @@ export default {
   putfile (url, data) {
     return new Promise((resolve, reject) => {
       axios.put(BASE_URL + url, data, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+        headers: { 'Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': store.getters.csrTokenGetter,
           'Content-Type': 'multipart/form-data'
         }})
@@ -87,10 +86,11 @@ export default {
         })
     })
   },
-  delete (url) {
+  delete (url, data) {
     return new Promise((resolve, reject) => {
       axios.delete(BASE_URL + url, {
-        headers: { 'X-Authorization': 'JWT ' + getAccessToken(),
+        params: data,
+        headers: { 'Authorization': 'JWT ' + getAccessToken(),
           'X-CSRFToken': store.getters.csrTokenGetter
         }})
         .then(response => {

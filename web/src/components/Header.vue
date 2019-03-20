@@ -64,7 +64,7 @@ export default {
       return isLoggedIn()
     },
     getLoginUser () {
-      return getLoginUser()
+      return getLoginUser().username
     },
     handleLogout () {
       logout()

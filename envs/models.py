@@ -12,10 +12,10 @@ class Envitem(models.Model):
     customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
     envtype = models.ForeignKey(Envtype, null=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=50, null=True, blank=True)
-    url = models.CharField(max_length=100, null=True, blank=True)
+    url = models.CharField(max_length=200, null=True, blank=True)
     username = models.CharField(max_length=30, null=True, blank=True)
     password = models.CharField(max_length=30, null=True, blank=True)
-    remark = models.TextField(max_length=500, null=True, blank=True)
+    remark = models.TextField(max_length=1000, null=True, blank=True)
 
     class Meta:
         ordering = ('customer', 'envtype', 'name')

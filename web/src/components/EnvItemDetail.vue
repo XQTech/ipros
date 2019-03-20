@@ -34,7 +34,8 @@
         </el-col>
         <el-col :span="12">
           <el-form-item label="Remarks" :label-width="formLabelWidth">
-            <el-input type="textarea" :rows="16" v-model="envitem.remark"></el-input>
+            <el-input type="textarea" :rows="16" v-model="envitem.remark"
+              :maxlength=1000></el-input>
           </el-form-item>
         </el-col>
       </el-row>

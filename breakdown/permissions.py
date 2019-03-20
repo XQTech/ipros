@@ -1,5 +1,6 @@
 from rest_framework import permissions
 
+from rest_framework.permissions import BasePermission, DjangoModelPermissions
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -14,3 +15,11 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the ticket.
         return obj.create_user.username == request.user.username
+
+ 
+ 
+# class ModelPermission(BasePermission):
+#     """ Access granted for requests with API key in header,
+#     or made by user with appropriate Django model permissions. """
+#     def has_permission(self, request, view):
+#         return DjangoModelPermissions().has_permission(request, view)

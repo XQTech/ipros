@@ -50,9 +50,6 @@
         prop="customer"
         :label="columns[1]"
         width="120">
-        <!-- <template slot-scope="scope">
-          <span>{{getCustomerbyID(scope.row.customer)}}</span>
-        </template> -->
       </el-table-column>
       <el-table-column
         prop="summary"
@@ -64,17 +61,11 @@
         prop="status"
         :label="columns[4]"
         width="100">
-        <!-- <template slot-scope="scope">
-          <span>{{getStatusbyID(scope.row.status)}}</span>
-        </template> -->
       </el-table-column>
       <el-table-column
         prop="assignee"
         :label="columns[2]"
         width="130">
-        <!-- <template slot-scope="scope">
-          <span>{{getUserbyID(scope.row.assigned_user)}}</span>
-        </template> -->
       </el-table-column>
       <el-table-column
         prop="gn_no"

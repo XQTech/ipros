@@ -80,7 +80,7 @@ class Breakdown(models.Model):
     ticket = models.ForeignKey(
         Ticket, on_delete=models.PROTECT, related_name='breakdowns')
     function_group = models.ForeignKey(FunctionGroup, null=True, on_delete=models.SET_NULL)
-    description = models.TextField(max_length=500, null=True, blank=True)
+    description = models.TextField(max_length=1000, null=True, blank=True)
     status = models.ForeignKey(Status, null=True, on_delete=models.SET_NULL)
     effort = models.FloatField(null=True, blank=True, default=0.0)        
     assigned_user = models.ForeignKey(

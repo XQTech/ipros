@@ -15,7 +15,7 @@ export default {
           commit('SET_REPORTER', response.data)
         })
         .catch(error => {
-          console.log(error)
+          params.self.$message.error(error)
         })
     }
   },

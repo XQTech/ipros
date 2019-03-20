@@ -37,7 +37,7 @@ export default {
           commit('SET_SUPLOG', response.data)
         })
         .catch(error => {
-          console.log(error)
+          params.self.$message.error(error)
         })
     },
     createSuplog ({commit}, params) {

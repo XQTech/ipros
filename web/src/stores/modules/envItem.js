@@ -56,7 +56,7 @@ export default {
           commit('SET_ENVITEM', response.data)
         })
         .catch(error => {
-          console.log(error)
+          params.self.$message.error(error)
         })
     },
     createEnvItem ({commit}, params) {

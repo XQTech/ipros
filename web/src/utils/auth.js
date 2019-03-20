@@ -8,6 +8,7 @@ import decode from 'jwt-decode'
 import axios from 'axios'
 const ACCESS_TOKEN_KEY = 'access_token'
 const USER_NAME = 'username'
+const USER_ID = 'user_id'
 
 const BACKEND_URL = process.env.URL_ROOT
 // const REDIRECT_URL_AFTER_LOGIN = '/'
@@ -16,9 +17,10 @@ export function login (username, password) {
   const url = `${BACKEND_URL}/api-token-auth/`
   axios.post(url, { username: username, password: password })
     .then(function (response) {
+      console.log(response)
       localStorage.setItem(ACCESS_TOKEN_KEY, response.data.token)
-      localStorage.setItem(USER_NAME, username)
-      // router.go(REDIRECT_URL_AFTER_LOGIN)
+      localStorage.setItem(USER_NAME, response.data.username)
+      localStorage.setItem(USER_ID, response.data.user_id)
     })
     .catch(function (error) {
       console.log(error)
@@ -27,7 +29,6 @@ export function login (username, password) {
 
 export function logout () {
   clearAccessToken()
-  // router.go('/')
 }
 
 export function requireAuth (to, from, next) {
@@ -46,7 +47,10 @@ export function getAccessToken () {
 }
 
 export function getLoginUser () {
-  return localStorage.getItem(USER_NAME)
+  return {
+    'username': localStorage.getItem(USER_NAME),
+    'id': parseInt(localStorage.getItem(USER_ID))
+  }
 }
 
 function clearAccessToken () {

@@ -16,7 +16,7 @@ export default {
           commit('SET_SUP_STATUS', response.data)
         })
         .catch(error => {
-          console.log(error)
+          params.self.$message.error(error)
         })
     }
   },

@@ -27,7 +27,7 @@ class SuplogViewSet(viewsets.ModelViewSet):
     filter_class = SuplogFilter
 
 class SuplogSummaryViewSet(APIView):
-    
+    queryset = Suplog.objects.none()
     def get_object(self):
         try:
             return Suplog.objects.all()

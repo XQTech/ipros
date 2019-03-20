@@ -31,7 +31,8 @@
           </el-form-item>
           <el-form-item label="Description" :label-width="formLabelWidth">
             <el-input type="textarea" :rows="7" v-model="selectedBreakdown.description" style="width:80%;"
-            placeholder="Add short description between '{' and '}' to be used in effort excel"></el-input>
+            placeholder="Add short description between '{' and '}' to be used in effort excel"
+            :maxlength=1000></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -157,14 +158,14 @@ export default {
         description: '',
         status: 1,
         effort: 0,
-        assigned_user: 3,
+        assigned_user: getLoginUser().id,
         image1: null,
         image2: null,
         image3: null,
         due_date: null,
         in_fd: true,
         in_bk: true,
-        create_user: getLoginUser()
+        create_user: getLoginUser().username
       }
       this.isAdd = true
       this.dialogFormVisible = true

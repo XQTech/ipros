@@ -45,8 +45,7 @@
     </el-form>
     <el-table
       :data="envItems"
-      style="width: 100%"
-      @row-dblclick="handleUpdate">
+      style="width: 100%">
       <el-table-column
         :label="columns[0]"
         width="100">
@@ -82,10 +81,11 @@
         width="200">
       </el-table-column>
       <el-table-column
-        prop="remark"
         :label="columns[6]"
-        min-width="260"
-        :show-overflow-tooltip="true">
+        min-width="260">
+        <template slot-scope="scope">
+          <el-input type="textarea" readonly :value="scope.row.remark"></el-input>
+        </template>
       </el-table-column>
       <el-table-column
         label="Action" width="150">

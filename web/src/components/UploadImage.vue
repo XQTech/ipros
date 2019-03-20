@@ -60,7 +60,7 @@ export default {
       this.selectedBreakdown = selectedBreakdown
     },
     handleRemove (file, fileList) {
-      this.$http.delete(this.actionUrl, {params: {name: file.name}})
+      this.$http.delete(this.actionUrl, {name: file.name})
         .then(response => {
         })
         .catch(error => {

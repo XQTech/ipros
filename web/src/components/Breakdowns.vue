@@ -13,8 +13,7 @@
     </div>
     <el-table
       :data="breakdowns"
-      style="width: 100%"
-      @row-dblclick="handleUpdate">
+      style="width: 100%">
       <el-table-column
         prop="sequence"
         label="SN"
@@ -42,10 +41,11 @@
         </template>
       </el-table-column>
       <el-table-column
-        prop="description"
         label="Description"
-        min-width="260"
-        :show-overflow-tooltip="true">
+        min-width="200">
+        <template slot-scope="scope">
+          <el-input type="textarea" readonly :value="scope.row.description"></el-input>
+        </template>
       </el-table-column>
       <el-table-column
         prop="effort"

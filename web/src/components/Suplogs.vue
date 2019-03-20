@@ -59,8 +59,7 @@
     </el-form>
     <el-table
       :data="suplogs"
-      style="width: 100%"
-      @row-dblclick="handleUpdate">
+      style="width: 100%">
       <el-table-column
         prop="id"
         :label="columns[11]"
@@ -97,16 +96,18 @@
         width="70">
       </el-table-column>
       <el-table-column
-        prop="description"
         :label="columns[5]"
-        min-width="260"
-        :show-overflow-tooltip="true">
+        min-width="200">
+        <template slot-scope="scope">
+          <el-input type="textarea" readonly :value="scope.row.description"></el-input>
+        </template>
       </el-table-column>
       <el-table-column
-        prop="solution"
         :label="columns[6]"
-        min-width="260"
-        :show-overflow-tooltip="true">
+        min-width="200">
+        <template slot-scope="scope">
+          <el-input type="textarea" readonly :value="scope.row.solution"></el-input>
+        </template>
       </el-table-column>
       <el-table-column
         :label="columns[7]"
