@@ -9,7 +9,7 @@
         <el-input placeholder="ID, e.g. 10,11,12" v-model="searchKeys.id__in" style="width:200px;"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-select v-model="searchKeys.customer" placeholder="Customer">
+        <el-select v-model="searchKeys.customer" placeholder="Customer" @change="customerChange()">
           <el-option v-for="item in customers"
             v-bind:key="item.id"
             :label="item.name"
@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item>
         <el-select v-model="searchKeys.system" placeholder="System">
-          <el-option v-for="item in modules"
+          <el-option v-for="item in modules" v-if="item.customer.includes(searchKeys.customer)"
             v-bind:key="item.id"
             :label="item.name"
             :value="item.id"></el-option>
@@ -327,6 +327,9 @@ export default {
       for (var key in this.searchKeys) {
         this.searchKeys[key] = ''
       }
+    },
+    customerChange () {
+      this.searchKeys.system = ''
     }
   }
 }

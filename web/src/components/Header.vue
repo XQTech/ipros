@@ -26,7 +26,7 @@
       <el-menu-item index="4" style="float:right;">
           <a :href="admin_rul" target="_blank" style="text-decoration: none;">Admin</a>
       </el-menu-item>
-      <span style="float:right;margin-top:18px;margin-right:15px;font-style:italic;">Welcome {{getLoginUser()}}</span>
+      <span class="welcome">Welcome {{getLoginUser()}}</span>
     </el-menu>
   </div>
 </template>
@@ -109,5 +109,12 @@ export default {
 }
 .el-breadcrumb {
   margin-bottom: 2vh;
+}
+.welcome {
+  float:right;
+  margin-top:20px;
+  margin-right:20px;
+  font-size: 14px;
+  color: #606266;
 }
 </style>

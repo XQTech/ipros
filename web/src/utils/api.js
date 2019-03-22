@@ -21,6 +21,8 @@ export default {
             reject(error.message)
           } else if (error.response.data.detail !== undefined) {
             reject(error.response.data.detail)
+          } else if (error.response.data.solution !== undefined) {
+            reject(error.response.data.solution)
           }
         })
     })
@@ -37,10 +39,13 @@ export default {
         .catch(error => {
           if (error.response === undefined ||
             error.response.data === undefined ||
-            error.response.data.detail === undefined) {
+            (error.response.data.detail === undefined &&
+              error.response.data.solution === undefined)) {
             reject(error.message)
           } else if (error.response.data.detail !== undefined) {
             reject(error.response.data.detail)
+          } else if (error.response.data.solution !== undefined) {
+            reject(error.response.data.solution)
           }
         })
     })
@@ -57,10 +62,13 @@ export default {
         .catch(error => {
           if (error.response === undefined ||
             error.response.data === undefined ||
-            error.response.data.detail === undefined) {
+            (error.response.data.detail === undefined &&
+              error.response.data.solution === undefined)) {
             reject(error.message)
           } else if (error.response.data.detail !== undefined) {
             reject(error.response.data.detail)
+          } else if (error.response.data.solution !== undefined) {
+            reject(error.response.data.solution)
           }
         })
     })
@@ -78,10 +86,13 @@ export default {
         .catch(error => {
           if (error.response === undefined ||
             error.response.data === undefined ||
-            error.response.data.detail === undefined) {
+            (error.response.data.detail === undefined &&
+              error.response.data.solution === undefined)) {
             reject(error.message)
           } else if (error.response.data.detail !== undefined) {
             reject(error.response.data.detail)
+          } else if (error.response.data.solution !== undefined) {
+            reject(error.response.data.solution)
           }
         })
     })
@@ -99,10 +110,13 @@ export default {
         .catch(error => {
           if (error.response === undefined ||
             error.response.data === undefined ||
-            error.response.data.detail === undefined) {
+            (error.response.data.detail === undefined &&
+              error.response.data.solution === undefined)) {
             reject(error.message)
           } else if (error.response.data.detail !== undefined) {
             reject(error.response.data.detail)
+          } else if (error.response.data.solution !== undefined) {
+            reject(error.response.data.solution)
           }
         })
     })

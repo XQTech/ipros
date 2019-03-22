@@ -18,11 +18,17 @@
 <script>
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { isLoggedIn } from './utils/auth'
 export default {
   name: 'App',
   components: {
     Header,
     Footer
+  },
+  created: function () {
+    if (!isLoggedIn()) {
+      this.$router.push({ name: 'Login' })
+    }
   }
 }
 </script>
