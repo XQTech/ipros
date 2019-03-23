@@ -57,6 +57,7 @@ export default {
     this.$store.dispatch('loadStatus', this.params)
     this.$store.dispatch('loadCustomers', this.params)
     this.$store.dispatch('loadUsers', this.params)
+    this.$store.dispatch('loadConfigs', this.params)
     this.loadTickets()
   },
   methods: {

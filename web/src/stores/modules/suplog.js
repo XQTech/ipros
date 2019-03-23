@@ -60,7 +60,6 @@ export default {
             resolve(response)
           })
           .catch(error => {
-            console.log(error)
             reject(error)
           })
       })

@@ -21,9 +21,11 @@ from django.db.models import Q
 from docx.shared import RGBColor
 from datetime import datetime
 from common.exception_handler import DataUnavailable
+from common.config import SysConfig, ConfigKey
 import os
 
 DOC_PATH = settings.MEDIA_ROOT + 'breakdown/'
+sysConfig = SysConfig()
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -108,7 +110,7 @@ class UsersViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     # queryset = BreakdownCategory.objects.filter(Q(parent=None))
-    queryset = BreakdownCategory.objects.filter()
+    queryset = BreakdownCategory.objects.all()
     serializer_class = bds.CategorySerializer
     pagination_class = None
 
@@ -133,13 +135,13 @@ class JiraView(APIView):
         """
         Return a list of all issues.
         """
-        jira_server = 'http://192.168.3.39:8080'
-        jira_username = 'liqiang'
-        jira_password = 'lq2017@gips'
+        jira_server = sysConfig.getStringConfig(ConfigKey.JIRA_SERVER)
+        jira_username = sysConfig.getStringConfig(ConfigKey.JIRA_ACCOUNT)
+        jira_password = sysConfig.getStringConfig(ConfigKey.JIRA_PASSWORD)
 
         myjira = JIRA(jira_server,basic_auth=(jira_username,jira_password))
-        # jql_str = "project%20%3D%20IPROS%20AND%20createdDate%20>%3D%202018-01-01%20AND%20type%20%3D%20Task%20"
-        jql_str = "project = IPROS AND createdDate >= 2018-01-01 AND type = Task"
+        # jql_str = "project = IPROS AND createdDate >= 2018-01-01 AND type = Task"
+        jql_str = sysConfig.getStringConfig(ConfigKey.JIRA_QUERY)
         fields = [
             'status',
             'fixVersions',
@@ -167,16 +169,16 @@ class UploadToJiraView(APIView):
         """
         Return a list of all issues.
         """
-        jira_server = 'http://192.168.3.39:8080'
-        jira_username = 'liqiang'
-        jira_password = 'lq2017@gips'
+        jira_server = sysConfig.getStringConfig(ConfigKey.JIRA_SERVER)
+        jira_username = sysConfig.getStringConfig(ConfigKey.JIRA_ACCOUNT)
+        jira_password = sysConfig.getStringConfig(ConfigKey.JIRA_PASSWORD)        
 
         myjira = JIRA(jira_server,basic_auth=(jira_username,jira_password))
         ticket = self.get_ticket(pk)
         docPath = DOC_PATH + ticket.ticket_no + '/'
-        docName = 'FD-' + ticket.ticket_no
+        docName = sysConfig.getStringConfig(ConfigKey.DOC_FD_NAME).replace('{0}', ticket.ticket_no)
         fullDocName = docPath + docName + '.docx'
-        xlsName = 'Breakdown-' + ticket.ticket_no
+        xlsName = sysConfig.getStringConfig(ConfigKey.DOC_BK_NAME).replace('{0}', ticket.ticket_no)
         fullXlsName = docPath + xlsName + '.xlsx'
         now = datetime.now()
         date_time = now.strftime("%Y%m%d%H%M%S")
@@ -202,12 +204,12 @@ class DocumentListView(APIView):
         ticketFolders = os.listdir(DOC_PATH)
         for folder in ticketFolders:
             fdPath = DOC_PATH + folder + '/'
-            docName = 'FD-' + folder + '.docx'
+            docName = sysConfig.getStringConfig(ConfigKey.DOC_FD_NAME).replace('{0}', folder) + '.docx'
             docs = []
             if os.path.exists(fdPath + docName):
                 docs.append(docName)                
             
-            xlsName = 'Breakdown-' + folder + '.xlsx'
+            xlsName = sysConfig.getStringConfig(ConfigKey.DOC_BK_NAME).replace('{0}', folder) + '.xlsx'
             if os.path.exists(fdPath + xlsName):
                 docs.append(xlsName)  
 
@@ -238,8 +240,10 @@ class GenerateDocView(APIView):
             raise DataUnavailable('No breakdown found!', 'Data_Unavailable')
 
         docPath = DOC_PATH + ticket.ticket_no + '/'
-        docName = docPath + 'FD-' + ticket.ticket_no + '.docx'
-        xlsName = docPath + 'Breakdown-' + ticket.ticket_no + '.xlsx'
+        docNameStr = sysConfig.getStringConfig(ConfigKey.DOC_FD_NAME).replace('{0}', ticket.ticket_no)
+        docName = docPath + docNameStr + '.docx'
+        xlsNameStr = sysConfig.getStringConfig(ConfigKey.DOC_BK_NAME).replace('{0}', ticket.ticket_no)
+        xlsName = docPath + xlsNameStr + '.xlsx'
         self.generateDoc(ticket, breakdowns.filter(in_fd=1), docName, docPath)
         self.generateXls(ticket, breakdowns.filter(in_bk=1), xlsName, docPath)
         return Response(docName)
@@ -343,13 +347,6 @@ class GenerateDocView(APIView):
         self.createCell(ws, startRow, startCol+2, titleFont, titleFill, thin_border, 'Function Group')
         self.createCell(ws, startRow, startCol+3, titleFont, titleFill, thin_border, 'Items')
         self.createCell(ws, startRow, startCol+4, titleFont, titleFill, thin_border, 'Effort(mds)')
-
-        # startRow += 1
-        # self.createCell(ws, startRow, startCol, detailFont, None, thin_border, 1)
-        # self.createCell(ws, startRow, startCol+1, detailFont, None, thin_border, 'Requirement Clarification')
-        # self.createCell(ws, startRow, startCol+2, detailFont, None, thin_border, '')
-        # self.createCell(ws, startRow, startCol+3, detailFont, None, thin_border, '1. Requirement Study\n2. Requirement Clarification')
-        # self.createCell(ws, startRow, startCol+4, detailFont, None, thin_border, 0)
 
         currentSubCategory = None
         currentFuncGroup = None

@@ -10,6 +10,7 @@ app_name = 'common'
 router = DefaultRouter()
 router.register(r'systems', views.SystemModuleViewSet)
 router.register(r'customers', views.CustomerViewSet)
+router.register(r'configs', views.ConfigViewSet)
 
 schema_view = get_schema_view(title='Pastebin API')
 # The API URLs are now determined automatically by the router.

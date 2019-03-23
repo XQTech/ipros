@@ -213,13 +213,16 @@ export default {
       return ''
     },
     getDocPath (ticket) {
-      return '../media/breakdown/' + ticket.ticket_no + '/FD-' + ticket.ticket_no + '.docx'
+      let docName = this.$store.getters.getConfigByKey('DOC_FD_NAME')
+      return '../media/breakdown/' + ticket.ticket_no + '/' + docName.replace('{0}', ticket.ticket_no) + '.docx'
     },
     getXlxPath (ticket) {
-      return '../media/breakdown/' + ticket.ticket_no + '/Breakdown-' + ticket.ticket_no + '.xlsx'
+      let docName = this.$store.getters.getConfigByKey('DOC_BK_NAME')
+      return '../media/breakdown/' + ticket.ticket_no + '/' + docName.replace('{0}', ticket.ticket_no) + '.xlsx'
     },
     getJiraPath (ticket) {
-      return 'http://192.168.3.39:8080/browse/' + ticket.ticket_no
+      let jiraurl = this.$store.getters.getConfigByKey('JIRA_SERVER')
+      return jiraurl + '/browse/' + ticket.ticket_no
     },
     handleBreakdown (ticket) {
       this.params.item = ticket
@@ -255,6 +258,7 @@ export default {
                 }
               })
               .catch(error => {
+                this.progressVisible = false
                 this.$message.error(error)
               })
           })
@@ -264,6 +268,10 @@ export default {
             this.progressVisible = false
             this.$message.success('Updated ' + this.oldCount + ' Tickets, Created ' + this.newCount + ' Tickets')
           }, 5000)
+        })
+        .catch(error => {
+          this.progressVisible = false
+          this.$message.error(error)
         })
     },
     retreiveTicket (jiraIssue) {
