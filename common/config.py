@@ -38,6 +38,7 @@ class ConfigKey(object):
     DOC_FD_NAME = "DOC_FD_NAME"
     DOC_BK_NAME = "DOC_BK_NAME"
     WARN_DUE_DAYS = "WARN_DUE_DAYS"
+    INCOMPLETE_BK_ST_ID = "INCOMPLETE_BK_ST_ID"
 
     class ConfigError(TypeError):
         pass

@@ -2,7 +2,11 @@ from rest_framework import serializers
 from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, BreakdownCategory
 from django.contrib.auth.models import User
 import datetime
+from common.config import SysConfig, ConfigKey
 
+
+sysConfig = SysConfig()
+incompleteIds = sysConfig.getStringConfig(ConfigKey.INCOMPLETE_BK_ST_ID).split(',')
 
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,10 +39,14 @@ class TicketSerializer(serializers.ModelSerializer):
         bks = obj.breakdowns.all()
         mindiff = 100
         for bk in bks:
-            if bk.due_date != None:
-                diff = (bk.due_date - datetime.date.today()).days
-                if mindiff > diff:
-                    mindiff = diff
+            try:
+                index = incompleteIds.index(str(bk.status.id))
+                if bk.due_date != None and index >= 0:
+                    diff = (bk.due_date - datetime.date.today()).days
+                    if mindiff > diff:
+                        mindiff = diff
+            except ValueError:
+                continue
 
         return mindiff
 

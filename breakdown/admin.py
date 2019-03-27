@@ -6,9 +6,9 @@ from .models import Status,Ticket,Breakdown,FunctionGroup,BreakdownCategory
 class BreakdownCategoryAdmin(admin.ModelAdmin):
     list_display = ('parent', 'code')
 
-admin.site.register(Status)
-# admin.site.register(Ticket)
-# admin.site.register(Breakdown)
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ('id', 'code')
+admin.site.register(Status, StatusAdmin)
 admin.site.register(FunctionGroup)
 admin.site.register(BreakdownCategory, BreakdownCategoryAdmin)
 
