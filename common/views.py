@@ -30,7 +30,8 @@ class ConfigViewSet(viewsets.ModelViewSet):
     keys = [
         ConfigKey.DOC_FD_NAME,
         ConfigKey.DOC_BK_NAME,
-        ConfigKey.JIRA_SERVER
+        ConfigKey.JIRA_SERVER,
+        ConfigKey.WARN_DUE_DAYS
     ]
     queryset = Config.objects.filter(key__in=keys)
     serializer_class = commonSerializer.ConfigSerializer

@@ -37,6 +37,7 @@ class ConfigKey(object):
     JIRA_SERVER = "JIRA_SERVER"
     DOC_FD_NAME = "DOC_FD_NAME"
     DOC_BK_NAME = "DOC_BK_NAME"
+    WARN_DUE_DAYS = "WARN_DUE_DAYS"
 
     class ConfigError(TypeError):
         pass

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from breakdown.models import Ticket, Breakdown, Status, FunctionGroup, BreakdownCategory
 from django.contrib.auth.models import User
+import datetime
 
 
 class StatusSerializer(serializers.ModelSerializer):
@@ -25,9 +26,21 @@ class BreakdownSerializer(serializers.ModelSerializer):
 
 class TicketSerializer(serializers.ModelSerializer):
     bkcount = serializers.SerializerMethodField()
+    restdays = serializers.SerializerMethodField()
 
     def get_bkcount(self, obj):
         return obj.breakdowns.count()
+    
+    def get_restdays(self, obj):
+        bks = obj.breakdowns.all()
+        mindiff = 100
+        for bk in bks:
+            if bk.due_date != None:
+                diff = (bk.due_date - datetime.date.today()).days
+                if mindiff > diff:
+                    mindiff = diff
+
+        return mindiff
 
     class Meta:
         model = Ticket

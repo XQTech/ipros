@@ -84,7 +84,7 @@
       </el-table-column>
       <el-table-column label="Action" width="200">
         <template slot-scope="scope">
-          <el-badge :value="scope.row.bkcount" class="item" type="info">
+          <el-badge :value="scope.row.bkcount" class="item" :type="getBadgeType(scope.row.restdays)">
             <el-button
             size="mini"
             type="primary"
@@ -232,6 +232,15 @@ export default {
       for (var key in this.searchKeys) {
         this.searchKeys[key] = ''
       }
+    },
+    getBadgeType (restdays) {
+      let warndays = this.$store.getters.getConfigByKey('WARN_DUE_DAYS')
+      if (restdays > 0 && restdays <= warndays) {
+        return 'warning'
+      } else if (restdays <= 0) {
+        return 'danger'
+      }
+      return 'info'
     },
     handleSyncTicket () {
       this.progressVisible = true
