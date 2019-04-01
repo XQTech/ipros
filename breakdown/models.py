@@ -36,13 +36,20 @@ class FunctionGroup(models.Model):
 
     def __str__(self):
         return self.description
+    
+    class Meta:
+        ordering = ('id',)
 
 class BreakdownCategory(models.Model):
     code = models.CharField(max_length=50)
     parent = models.ForeignKey('self', related_name='sub_category', blank=True, null=True, on_delete=models.SET_NULL)
+    tips = models.TextField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return self.code
+    
+    class Meta:
+        ordering = ('id',)
 
 
 class Ticket(models.Model):

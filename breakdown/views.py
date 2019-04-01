@@ -35,15 +35,39 @@ def api_root(request, format=None):
     })
 
 class TicketViewSet(viewsets.ModelViewSet):
-    """
-    This viewset automatically provides `list`, `create`, `retrieve`,
-    `update` and `destroy` actions.
-
-    """
     queryset = Ticket.objects.all()
     serializer_class = bds.TicketSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = TicketFilter
+
+    def perform_create(self, serializer):        
+        ticket = serializer.save()
+        categoryIds = [int(s) for s in sysConfig.getStringConfig(ConfigKey.BK_TEMPLATE_CATEGORY_IDS).split(',')]
+        inFds = sysConfig.getStringConfig(ConfigKey.BK_TEMPLATE_INFD_VALUES).split(',')
+        inBks = sysConfig.getStringConfig(ConfigKey.BK_TEMPLATE_INBK_VALUES).split(',')
+        staus = int(sysConfig.getStringConfig(ConfigKey.BK_TEMPLATE_STATUS))
+        func = int(sysConfig.getStringConfig(ConfigKey.BK_TEMPLATE_FUNC))
+        for i in range(len(categoryIds)):
+            self.getBreakdown(
+                i+1, BreakdownCategory.objects.get(pk=categoryIds[i]), 
+                ticket,
+                Status.objects.get(pk=staus),
+                FunctionGroup.objects.get(pk=func),
+                True if inFds[i] == '1' else False, 
+                True if inBks[i] == '1' else False, 
+                ).save()
+
+    def getBreakdown(self, sequence, category, ticket, status, func, infd, inbk):
+        bk = Breakdown()
+        bk.sequence = sequence
+        bk.ticket = ticket
+        bk.category = category
+        bk.status = status
+        bk.function_group = func
+        bk.in_fd = infd
+        bk.in_bk = inbk
+        return bk
+
 
 
 class BreakdownViewSet(viewsets.ModelViewSet):
@@ -114,18 +138,6 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = bds.CategorySerializer
     pagination_class = None
 
-# For auth with JWT
-# class RestrictedView(APIView):
-#     permission_classes = (IsAuthenticated, )
-#     authentication_classes = (JSONWebTokenAuthentication, )
-
-#     def get(self, request):
-#         data = {
-#             'id': request.user.id,
-#             'username': request.user.username,
-#             'token': str(request.auth)
-#         }
-#         return Response(data)
 
 class JiraView(APIView):
 
@@ -339,14 +351,14 @@ class GenerateDocView(APIView):
         ws.column_dimensions['A'].width = 2
         ws.column_dimensions['B'].width = 5
         ws.column_dimensions['C'].width = 15
-        ws.column_dimensions['D'].width = 25
-        ws.column_dimensions['E'].width = 80
-        ws.column_dimensions['F'].width = 15
+        # ws.column_dimensions['D'].width = 25
+        ws.column_dimensions['D'].width = 80
+        ws.column_dimensions['E'].width = 15
         self.createCell(ws, startRow, startCol, titleFont, titleFill, thin_border, 'SN')
         self.createCell(ws, startRow, startCol+1, titleFont, titleFill, thin_border, 'Category')
-        self.createCell(ws, startRow, startCol+2, titleFont, titleFill, thin_border, 'Function Group')
-        self.createCell(ws, startRow, startCol+3, titleFont, titleFill, thin_border, 'Items')
-        self.createCell(ws, startRow, startCol+4, titleFont, titleFill, thin_border, 'Effort(mds)')
+        # self.createCell(ws, startRow, startCol+2, titleFont, titleFill, thin_border, 'Function Group')
+        self.createCell(ws, startRow, startCol+2, titleFont, titleFill, thin_border, 'Items')
+        self.createCell(ws, startRow, startCol+3, titleFont, titleFill, thin_border, 'Effort(mds)')
 
         currentSubCategory = None
         currentFuncGroup = None
@@ -363,8 +375,10 @@ class GenerateDocView(APIView):
             funcGroup = bk.function_group
             if category == None or funcGroup == None:
                 raise DataUnavailable('Category or Function Group is not defined!', 'Data_Unavailable')
+            if category.parent != None:
+                category = category.parent
             self.createCell(ws, row, startCol+1, detailFont, None, thin_border, category.code)
-            self.createCell(ws, row, startCol+2, detailFont, None, thin_border, funcGroup.description)
+            # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, funcGroup.description)
             try:
                 startIndex = bk.description.index('{') + 1
                 endIndex = bk.description.index('}')
@@ -372,21 +386,21 @@ class GenerateDocView(APIView):
                 startIndex = 0
                 endIndex = 0
             if startIndex > 0 or endIndex > 0:
-                self.createCell(ws, row, startCol+3, detailFont, None, thin_border, bk.description[startIndex:endIndex])
+                self.createCell(ws, row, startCol+2, detailFont, None, thin_border, bk.description[startIndex:endIndex])
             else:
-                self.createCell(ws, row, startCol+3, detailFont, None, thin_border, bk.description)
+                self.createCell(ws, row, startCol+2, detailFont, None, thin_border, bk.description)
 
-            self.createCell(ws, row, startCol+4, detailFont, None, thin_border, bk.effort)
+            self.createCell(ws, row, startCol+3, detailFont, None, thin_border, bk.effort)
             devEffort += bk.effort
             
-            if currentFuncGroup == None:
-                funcStartRow = row
-                currentFuncGroup = funcGroup.id
-            elif currentFuncGroup != funcGroup.id:
-                if funcStartRow < row - 1:
-                    ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
-                funcStartRow = row
-                currentFuncGroup = funcGroup.id
+            # if currentFuncGroup == None:
+            #     funcStartRow = row
+            #     currentFuncGroup = funcGroup.id
+            # elif currentFuncGroup != funcGroup.id:
+            #     if funcStartRow < row - 1:
+            #         ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
+            #     funcStartRow = row
+            #     currentFuncGroup = funcGroup.id
 
             if currentSubCategory == None:
                 categoryStartRow = row
@@ -397,42 +411,18 @@ class GenerateDocView(APIView):
                 categoryStartRow = row
                 currentSubCategory = category.id
                 # set index for func group
-                if funcStartRow < row - 1:
-                    ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
-                funcStartRow = row
+                # if funcStartRow < row - 1:
+                #     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row - 1, end_column=startCol+2)
+                # funcStartRow = row
                 currentFuncGroup = funcGroup.id
             elif i == len(breakdowns) + 1 and categoryStartRow < row:
                 ws.merge_cells(start_row=categoryStartRow, start_column=startCol+1, end_row=row, end_column=startCol+1)
                 # set index for func group
-                if funcStartRow < row:
-                    ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row, end_column=startCol+2)
-
-        # row += 1
-        # i += 1
-        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'QA Test')
-        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, '1.Prepare test  cases. \n2. Test execution')
-        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, devEffort * 0.15)
-
-        # row += 1
-        # i += 1
-        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Deployment')
-        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'To both testing and live servers')
-        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 1)
-
-        # row += 1
-        # i += 1
-        # self.createCell(ws, row, startCol, detailFont, None, thin_border, i)
-        # self.createCell(ws, row, startCol+1, detailFont, None, thin_border, 'Support&Warranty')
-        # self.createCell(ws, row, startCol+2, detailFont, None, thin_border, '')
-        # self.createCell(ws, row, startCol+3, detailFont, None, thin_border, 'Support Customer Testing and Warranty')
-        # self.createCell(ws, row, startCol+4, detailFont, None, thin_border, 0)
+                # if funcStartRow < row:
+                #     ws.merge_cells(start_row=funcStartRow, start_column=startCol+2, end_row=row, end_column=startCol+2)
 
         formula = '=SUM(F' + str(startRow) + ':F' + str(row) + ')'
-        self.createCell(ws, row + 1, startCol+4, titleFont, titleFill, None, formula)
+        self.createCell(ws, row + 1, startCol+3, titleFont, titleFill, None, formula)
 
         if os.path.exists(docName):
             os.remove(docName)
@@ -450,6 +440,7 @@ class GenerateDocView(APIView):
         if border:
             col_sn.border = border
         col_sn.alignment = Alignment(wrap_text=True)
+
 
 
 

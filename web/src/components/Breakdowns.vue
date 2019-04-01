@@ -73,7 +73,10 @@
       </el-table-column>
       <el-table-column
         label="in FD"
-        width="100">
+        width="100"
+        prop="in_fd"
+        :filters="[{text: 'Yes', value: true}, {text: 'No', value: false}]"
+        :filter-method="filterFd">
         <template slot-scope="scope">
           <i class="fa fa-check" v-if="scope.row.in_fd"></i>
           <i class="fa fa-times" v-else></i>
@@ -81,7 +84,10 @@
       </el-table-column>
       <el-table-column
         label="in Eft Bk"
-        width="100">
+        width="100"
+        prop="in_bk"
+        :filters="[{text: 'Yes', value: true}, {text: 'No', value: false}]"
+        :filter-method="filterBk">
         <template slot-scope="scope">
           <i class="fa fa-check" v-if="scope.row.in_bk"></i>
           <i class="fa fa-times" v-else></i>
@@ -261,6 +267,12 @@ export default {
         .catch(error => {
           this.$message.error(error)
         })
+    },
+    filterFd (value, row) {
+      return row.in_fd === value
+    },
+    filterBk (value, row) {
+      return row.in_bk === value
     }
   }
 }

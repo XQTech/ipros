@@ -31,7 +31,7 @@
           </el-form-item>
           <el-form-item label="Description" :label-width="formLabelWidth">
             <el-input type="textarea" :rows="7" v-model="selectedBreakdown.description" style="width:80%;"
-            placeholder="Add short description between '{' and '}' to be used in effort excel"
+            :placeholder="getCategoryTips()"
             :maxlength=1000></el-input>
           </el-form-item>
         </el-col>
@@ -135,6 +135,15 @@ export default {
         value: element.id,
         label: element.code
       }
+    },
+    getCategoryTips () {
+      let tips = this.$store.getters.getCategoryById(this.selectedBreakdown.category).tips
+      if (tips === null) {
+        tips = ''
+      } else {
+        tips = tips + '\n\n'
+      }
+      return tips + "Add short description between '{' and '}' to be used in effort excel \n"
     },
     updateBreakdown (selectedBreakdown) {
       this.isAdd = false

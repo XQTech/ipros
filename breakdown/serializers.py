@@ -63,7 +63,7 @@ class CategorySerializer(serializers.ModelSerializer):
     sub_category = SubCategorySerializer(many=True)
     class Meta:
         model = BreakdownCategory
-        fields = ('id','code','parent','sub_category')
+        fields = ('id', 'code', 'parent', 'tips', 'sub_category')
 
 
 

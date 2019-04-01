@@ -118,4 +118,8 @@ export default {
   font-size: 14px;
   color: #606266;
 }
+.el-textarea__inner {
+  word-break: keep-all;
+  word-wrap: break-word;
+}
 </style>
