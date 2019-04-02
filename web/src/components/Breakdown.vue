@@ -171,7 +171,7 @@ export default {
         image1: null,
         image2: null,
         image3: null,
-        due_date: null,
+        due_date: selectedTicket.due_date,
         in_fd: true,
         in_bk: true,
         create_user: getLoginUser().username
