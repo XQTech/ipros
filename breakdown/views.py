@@ -258,7 +258,25 @@ class GenerateDocView(APIView):
         breakdowns = self.get_breakdown(pk)
         if breakdowns == None or len(breakdowns) == 0:
             raise DataUnavailable('No breakdown found!', 'Data_Unavailable')
-
+        # print('Getting template file')
+        # doc = Document(DOC_PATH + '/IPROS_Change_Request_Form.docx')
+        # for p in doc.paragraphs:
+        #     print('=====================')
+        #     print(p.text)
+        #     # if "<SUM-OF-CHANGE>" in p.text:
+        #     print('=========got you============')
+        #     inline = p.runs
+        #     print(len(inline))
+        #     # Loop added to work with runs (strings with same style)
+        #     for i in range(len(inline)):
+        #         print(inline[i].text)
+        #         if "SUMMOFCHANGE" in inline[i].text:
+        #             text = inline[i].text.replace("SUMMOFCHANGE", "IPROS")
+        #             inline[i].text = text
+        #             print('======replacing...=====' + inline[i].text)
+        
+        # doc.save(DOC_PATH + '/created.docx')
+                
         docPath = DOC_PATH + ticket.ticket_no + '/'
         docNameStr = sysConfig.getStringConfig(ConfigKey.DOC_FD_NAME).replace('{0}', ticket.ticket_no)
         docName = docPath + docNameStr + '.docx'
